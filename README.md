@@ -87,7 +87,7 @@
 3. 在项目根目录下，打开命令行，运行`npm install`来下载依赖。
 4. 执行`npm run dev`来启动项目，项目默认地址为[`http://localhost:3000`](http://localhost:3000)
 5. 在浏览器中打开[`http://localhost:3000`](http://localhost:3000)  来访问项目。
-6. 执行`npm run build-nocdn`打包项目文件
+6. 执行`npm run build`打包项目文件
 
 ## 功能与建议
 

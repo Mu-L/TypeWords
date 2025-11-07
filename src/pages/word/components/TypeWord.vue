@@ -293,14 +293,18 @@ function del() {
 function showWord() {
   if (settingStore.allowWordTip) {
     showFullWord = true
-  }
-  //系统设定的默认模式情况下，如果看了单词统计到错词里面去
-  switch (statStore.step) {
-    case 1:
-    case 3:
-    case 4:
-      emit('wrong')
-      break
+    //系统设定的默认模式情况下，如果看了单词统计到错词里面去
+    switch (statStore.step) {
+      case 1:
+      case 2:
+      case 4:
+      case 5:
+      case 7:
+      case 8:
+      case 10:
+        emit('wrong')
+        break
+    }
   }
 }
 
@@ -309,6 +313,9 @@ function hideWord() {
 }
 
 function play() {
+  if (settingStore.wordPracticeType === WordPracticeType.Dictation) {
+    emit('wrong')
+  }
   volumeIconRef?.play()
 }
 
