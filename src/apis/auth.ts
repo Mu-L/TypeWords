@@ -62,7 +62,23 @@ export interface WechatLoginParams {
 
 // API 函数定义
 export function login(params: LoginParams) {
-  return http<LoginResponse>('auth/login', params, null, 'post')
+  // 暂时直接返回成功响应，等待后端接入
+  return Promise.resolve({
+    success: true,
+    code: 200,
+    msg: '登录成功',
+    data: {
+      token: 'mock_token_' + Date.now(),
+      user: {
+        id: '1',
+        email: params.email,
+        phone: params.phone,
+        nickname: '测试用户',
+        avatar: ''
+      }
+    }
+  })
+  // return http<LoginResponse>('auth/login', params, null, 'post')
 }
 
 export function register(params: RegisterParams) {
@@ -70,6 +86,11 @@ export function register(params: RegisterParams) {
 }
 
 export function sendCode(params: SendCodeParams) {
+  return Promise.resolve({
+    success: true,
+    code: 200,
+    msg: '登录成功',
+  })
   return http<boolean>('auth/sendCode', params, null, 'post')
 }
 

@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { ref, useAttrs, watch } from 'vue';
+import {defineComponent, ref, useAttrs, watch, computed} from 'vue';
 import Close from "@/components/icon/Close.vue";
-import { useDisableEventListener } from "@/hooks/event.ts";
+import {useDisableEventListener} from "@/hooks/event.ts";
+
+defineOptions({
+  name: "BaseInput",
+})
 
 const props = defineProps({
   modelValue: [String, Number],
   placeholder: String,
   disabled: Boolean,
   autofocus: Boolean,
+  error: Boolean,
   type: {
     type: String,
     default: 'text',
@@ -32,34 +37,31 @@ const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur
 const attrs = useAttrs();
 
 const inputValue = ref(props.modelValue);
-const errorMsg = ref('');
 let focus = $ref(false)
 let inputEl = $ref<HTMLDivElement>()
+const passwordVisible = ref(false)
+
+const inputType = computed(() => {
+  if (props.type === 'password') {
+    return passwordVisible.value ? 'text' : 'password'
+  }
+  return props.type
+})
+
+const togglePasswordVisibility = () => {
+  passwordVisible.value = !passwordVisible.value
+}
 
 watch(() => props.modelValue, (val) => {
   inputValue.value = val;
-  validate(val);
 });
-
-const validate = (val: string | number | null | undefined) => {
-  let err = '';
-  const strVal = val == null ? '' : String(val);
-  if (props.required && !strVal.trim()) {
-    err = '不能为空';
-  } else if (props.maxLength && strVal.length > props.maxLength) {
-    err = `长度不能超过 ${props.maxLength} 个字符`;
-  }
-  errorMsg.value = err;
-  emit('validation', err === '', err);
-  return err === '';
-};
 
 const onInput = (e: Event) => {
   const target = e.target as HTMLInputElement;
   inputValue.value = target.value;
-  validate(target.value);
   emit('update:modelValue', target.value);
   emit('input', e);
+  emit('change', e);
 };
 
 const onChange = (e: Event) => {
@@ -73,14 +75,11 @@ const onFocus = (e: FocusEvent) => {
 
 const onBlur = (e: FocusEvent) => {
   focus = false
-  validate(inputValue.value);
   emit('blur', e);
 };
 
 const clearInput = () => {
-
   inputValue.value = '';
-  validate('');
   emit('update:modelValue', '');
 };
 
@@ -99,50 +98,63 @@ const vFocus = {
 </script>
 
 <template>
-  <div class="base-input2"
+  <div class="base-input"
        ref="inputEl"
-       :class="{ 'is-disabled': disabled, 'has-error': errorMsg,focus, [`base-input2--${size}`]: true }">
+       :class="{ 'is-disabled': disabled, 'error': props.error, focus, [`base-input--${size}`]: true }">
     <slot name="subfix"></slot>
     <input
-        v-bind="attrs"
-        :type="type"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :value="inputValue"
-        @input="onInput"
-        @change="onChange"
-        @focus="onFocus"
-        @blur="onBlur"
-        class="inner"
-        v-focus="autofocus"
-        :maxlength="maxLength"
+      v-bind="attrs"
+      :type="inputType"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :value="inputValue"
+      @input="onInput"
+      @change="onChange"
+      @focus="onFocus"
+      @blur="onBlur"
+      class="inner"
+      v-focus="autofocus"
+      :maxlength="maxLength"
     />
     <slot name="prefix"></slot>
     <Close
-        v-if="clearable && inputValue && !disabled"
-        @click="clearInput"/>
-    <div v-if="errorMsg" class="base-input2__error">{{ errorMsg }}</div>
+      v-if="clearable && inputValue && !disabled"
+      @click="clearInput"/>
+    <!-- Password visibility toggle -->
+    <div
+      v-if="type === 'password' && !disabled"
+      class="password-toggle"
+      @click="togglePasswordVisibility"
+      :title="passwordVisible ? '隐藏密码' : '显示密码'">
+      <IconFluentEye16Regular v-if="!passwordVisible"/>
+      <IconFluentEyeOff16Regular v-else/>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.base-input2 {
+.base-input {
   position: relative;
   display: inline-flex;
   box-sizing: border-box;
   width: 100%;
   border: 1px solid var(--color-input-border);
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
   padding: .2rem .3rem;
   transition: all .3s;
   align-items: center;
   background: var(--color-input-bg);
 
+  ::placeholder {
+    font-size: 0.9rem;
+    color: darkgray;
+  }
+
   // normal size (default)
   &--normal {
     padding: .2rem .3rem;
-    
+
     .inner {
       height: 1.5rem;
       font-size: 1rem;
@@ -151,8 +163,9 @@ const vFocus = {
 
   // large size
   &--large {
-    padding: .6rem .8rem;
-    
+    padding: .4rem .6rem;
+    border-radius: .5rem;
+
     .inner {
       height: 2rem;
       font-size: 1.125rem;
@@ -163,16 +176,9 @@ const vFocus = {
     opacity: 0.6;
   }
 
-  &.has-error {
-    .base-input2__inner {
-      border-color: #f56c6c;
-    }
-
-    .base-input2__error {
-      color: #f56c6c;
-      font-size: 0.85rem;
-      margin-top: 0.25rem;
-    }
+  &.error {
+    border-color: #f56c6c;
+    background: rgba(245, 108, 108, 0.07);
   }
 
   &.focus {
@@ -182,10 +188,6 @@ const vFocus = {
   &:disabled {
     background-color: #f5f5f5;
     cursor: not-allowed;
-  }
-
-  &__error {
-    padding-left: 0.5rem;
   }
 
   .inner {
@@ -199,6 +201,23 @@ const vFocus = {
     color: var(--color-input-color);
     background: transparent;
     width: 100%;
+  }
+
+  .password-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: 4px;
+    cursor: pointer;
+    color: var(--color-input-color);
+    opacity: 0.6;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 </style>

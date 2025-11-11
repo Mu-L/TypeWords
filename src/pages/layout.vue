@@ -44,10 +44,10 @@ function goHome() {
           <span v-if="settingStore.sideExpand">设置</span>
           <div class="red-point" :class="!settingStore.sideExpand && 'top-1 right-0'" v-if="runtimeStore.isNew"></div>
         </div>
-        <!--        <div class="row" @click="router.push('/user')">-->
-        <!--          <IconFluentPerson20Regular/>-->
-        <!--          <span v-if="settingStore.sideExpand">用户</span>-->
-        <!--        </div>-->
+        <div class="row" @click="router.push('/user')">
+          <IconFluentPerson20Regular/>
+          <span v-if="settingStore.sideExpand">用户</span>
+        </div>
       </div>
       <div class="bottom flex justify-evenly ">
         <BaseIcon

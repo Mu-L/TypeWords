@@ -63,6 +63,8 @@ const router = VueRouter.createRouter({
 
 // 路由守卫
 router.beforeEach(async (to: any, from: any) => {
+  return true
+
   const authStore = useAuthStore()
   
   // 公共路由，不需要登录验证
@@ -78,7 +80,7 @@ router.beforeEach(async (to: any, from: any) => {
     // 尝试初始化认证状态
     const isInitialized = await authStore.initAuth()
     if (!isInitialized) {
-      return { path: '/login', query: { redirect: to.fullPath } }
+      return {path: '/login', query: {redirect: to.fullPath}}
     }
   }
   

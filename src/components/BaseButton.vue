@@ -86,6 +86,7 @@ defineEmits(['click'])
     padding: 0 1.3rem;
     height: 2.4rem;
     font-size: 0.9rem;
+    border-radius: .5rem;
   }
 
   & > span {

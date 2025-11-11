@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { login as loginApi, register as registerApi, logout as logoutApi, getUserInfo, resetPassword as resetPasswordApi, type LoginParams, type RegisterParams } from '@/apis/auth'
 import Toast from '@/components/base/toast/Toast.ts'
 import router from '@/router.ts'
+import {sleep} from "@/utils";
 export interface User {
   id: string
   email?: string

@@ -30,7 +30,7 @@ export const PHONE_CONFIG = {
   sendInterval: 60,
 
   // 手机号正则表达式（中国大陆）
-  phoneRegex: /^1[3-9]\d{9}$/
+  phoneRegex: /^1[2-9]\d{9}$/
 }
 
 // 邮箱配置
@@ -45,7 +45,7 @@ export const EMAIL_CONFIG = {
 // 密码配置
 export const PASSWORD_CONFIG = {
   // 密码最小长度
-  minLength: 6,
+  minLength: 9,
 
   // 密码最大长度
   maxLength: 20
