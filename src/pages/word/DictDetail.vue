@@ -1,11 +1,11 @@
 <script setup lang="tsx">
-import { DictId } from "@/types/types.ts";
+import {DictId} from "@/types/types.ts";
 
 import BasePage from "@/components/BasePage.vue";
-import { computed, onMounted, reactive, ref, shallowReactive } from "vue";
-import { useRuntimeStore } from "@/stores/runtime.ts";
-import { _getDictDataByUrl, _nextTick, convertToWord, isMobile, loadJsLib, sleep, useNav } from "@/utils";
-import { nanoid } from "nanoid";
+import {computed, onMounted, reactive, ref, shallowReactive, watch} from "vue";
+import {useRuntimeStore} from "@/stores/runtime.ts";
+import {_getDictDataByUrl, _nextTick, convertToWord, isMobile, loadJsLib, sleep, useNav} from "@/utils";
+import {nanoid} from "nanoid";
 import BaseIcon from "@/components/BaseIcon.vue";
 import BaseTable from "@/components/BaseTable.vue";
 import WordItem from "@/components/WordItem.vue";
@@ -13,21 +13,22 @@ import Toast from '@/components/base/toast/Toast.ts'
 import PopConfirm from "@/components/PopConfirm.vue";
 import BackIcon from "@/components/BackIcon.vue";
 import BaseButton from "@/components/BaseButton.vue";
-import { useRoute, useRouter } from "vue-router";
-import { useBaseStore } from "@/stores/base.ts";
+import {useRoute, useRouter} from "vue-router";
+import {useBaseStore} from "@/stores/base.ts";
 import EditBook from "@/pages/article/components/EditBook.vue";
-import { getDefaultDict } from "@/types/func.ts";
+import {getDefaultDict} from "@/types/func.ts";
 import BaseInput from "@/components/base/BaseInput.vue";
 import Textarea from "@/components/base/Textarea.vue";
 import FormItem from "@/components/base/form/FormItem.vue";
 import Form from "@/components/base/form/Form.vue";
 import DeleteIcon from "@/components/icon/DeleteIcon.vue";
-import { getCurrentStudyWord } from "@/hooks/dict.ts";
+import {getCurrentStudyWord} from "@/hooks/dict.ts";
 import PracticeSettingDialog from "@/pages/word/components/PracticeSettingDialog.vue";
-import { useSettingStore } from "@/stores/setting.ts";
-import { MessageBox } from "@/utils/MessageBox.tsx";
-import { AppEnv, Origin, PracticeSaveWordKey } from "@/config/env.ts";
-import { detail } from "@/apis";
+import {useSettingStore} from "@/stores/setting.ts";
+import {MessageBox} from "@/utils/MessageBox.tsx";
+import {AppEnv, Origin, PracticeSaveWordKey, TourConfig} from "@/config/env.ts";
+import {detail} from "@/apis";
+import Shepherd from "shepherd.js";
 
 const runtimeStore = useRuntimeStore()
 const base = useBaseStore()
@@ -384,6 +385,75 @@ function searchWord() {
   console.log('wordForm.word', wordForm.word)
 }
 
+
+watch(() => loading, (val) => {
+  if (!val) return
+  _nextTick(() => {
+    const tour = new Shepherd.Tour(TourConfig);
+    tour.addStep({
+      id: 'step3',
+      text: '点击这里开始学习',
+      attachTo: {element: '#study', on: 'bottom'},
+      buttons: [
+        {
+          text: `下一步（3/${TourConfig.total}）`,
+          action() {
+            // localStorage.setItem('shepherd_step', 'step3');
+            tour.next()
+            addMyStudyList()
+          }
+        }
+      ]
+    });
+
+    tour.addStep({
+      id: 'step4',
+      text: '点击这里选择学习模式',
+      attachTo: {element: '#mode', on: 'bottom'},
+      beforeShowPromise() {
+        return new Promise((resolve) => {
+          const timer = setInterval(() => {
+            if (document.querySelector('#mode')) {
+              clearInterval(timer);
+              resolve(true);
+            }
+          }, 100);
+        });
+      },
+      buttons: [
+        {
+          text: `下一步（4/${TourConfig.total}）`,
+          action: tour.next
+        }
+      ]
+    });
+
+    tour.addStep({
+      id: 'step5',
+      text: '点击这里开始学习',
+      attachTo: {element: '#dialog-ok', on: 'bottom'},
+      buttons: [
+        {
+          text: `下一步（5/${TourConfig.total}）`,
+          action() {
+            localStorage.setItem('shepherd_step', 'step6');
+            tour.next()
+            startPractice()
+          }
+        }
+      ]
+    });
+
+    const stepId = localStorage.getItem('shepherd_step');
+    if (stepId) {
+      // localStorage.removeItem('shepherd_step');
+      tour.start();
+      tour.show(stepId); // 直接跳到对应步骤
+    }
+  },)
+})
+
+
 defineRender(() => {
   return (
     <BasePage>
@@ -395,7 +465,7 @@ defineRender(() => {
               <div class="dict-actions flex">
                 <BaseButton loading={studyLoading || loading} type="info"
                             onClick={() => isEdit = true}>编辑</BaseButton>
-                <BaseButton loading={studyLoading || loading} onClick={addMyStudyList}>学习</BaseButton>
+                <BaseButton id="study" loading={studyLoading || loading} onClick={addMyStudyList}>学习</BaseButton>
                 <BaseButton loading={studyLoading || loading} onClick={startTest}>测试</BaseButton>
               </div>
             </div>

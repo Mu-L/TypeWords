@@ -74,3 +74,15 @@ export const PracticeSaveArticleKey = {
   key: 'PracticeSaveArticle',
   version: 1
 }
+
+export const TourConfig = {
+  useModalOverlay: true,
+  defaultStepOptions: {
+    canClickTarget: false,
+    classes: 'shadow-md bg-purple-dark',
+    cancelIcon: {enabled: true},
+    modalOverlayOpeningPadding: 10,
+    modalOverlayOpeningRadius: 6,
+  },
+  total: 10
+}

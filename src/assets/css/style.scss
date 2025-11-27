@@ -1,6 +1,10 @@
 @use "anim" as *;
-@use 'intro.js/minified/introjs.min.css';
+//@use 'intro.js/minified/introjs.min.css';
+@use 'shepherd.js/dist/css/shepherd.css';
 
+.shepherd-enabled.shepherd-element{
+  transform: translateY(30px);
+}
 :root {
   --color-reverse-white: white;
   --color-reverse-black: black;

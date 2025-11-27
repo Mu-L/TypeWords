@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import { groupBy, resourceWrap, useNav } from "@/utils";
+import {_nextTick, groupBy, resourceWrap, useNav} from "@/utils";
 import BasePage from "@/components/BasePage.vue";
-import { DictResource } from "@/types/types.ts";
-import { useRuntimeStore } from "@/stores/runtime.ts";
+import {DictResource} from "@/types/types.ts";
+import {useRuntimeStore} from "@/stores/runtime.ts";
 import BaseIcon from "@/components/BaseIcon.vue";
 import Empty from "@/components/Empty.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import DictList from "@/components/list/DictList.vue";
 import BackIcon from "@/components/BackIcon.vue";
 import DictGroup from "@/components/list/DictGroup.vue";
-import { useBaseStore } from "@/stores/base.ts";
-import { useRouter } from "vue-router";
-import { computed } from "vue";
-import { getDefaultDict } from "@/types/func.ts";
-import { useFetch } from "@vueuse/core";
-import { DICT_LIST } from "@/config/env.ts";
+import {useBaseStore} from "@/stores/base.ts";
+import {useRouter} from "vue-router";
+import {computed, onMounted, watch} from "vue";
+import {getDefaultDict} from "@/types/func.ts";
+import {useFetch} from "@vueuse/core";
+import {DICT_LIST, TourConfig} from "@/config/env.ts";
 import BaseInput from "@/components/base/BaseInput.vue";
+import Shepherd from "shepherd.js";
 
 const {nav} = useNav()
 const runtimeStore = useRuntimeStore()
@@ -56,7 +57,7 @@ const groupedByCategoryAndTag = $computed(() => {
     data.push([key, groupByDictTags(value)])
   }
   [data[2], data[3]] = [data[3], data[2]];
-  console.log('data',data)
+  console.log('data', data)
   return data
 })
 
@@ -68,13 +69,44 @@ const searchList = computed<any[]>(() => {
     let s = searchKey.toLowerCase()
     return dict_list.value.filter((item) => {
       return item.id.toLowerCase().includes(s)
-          || item.name.toLowerCase().includes(s)
-          || item.category.toLowerCase().includes(s)
-          || item.tags.join('').replace('所有', '').toLowerCase().includes(s)
-          || item?.url?.toLowerCase?.().includes?.(s)
+        || item.name.toLowerCase().includes(s)
+        || item.category.toLowerCase().includes(s)
+        || item.tags.join('').replace('所有', '').toLowerCase().includes(s)
+        || item?.url?.toLowerCase?.().includes?.(s)
     })
   }
   return []
+})
+
+watch(dict_list, (val) => {
+  if (!val.length) return
+  let cet4 = val.find(v => v.id === 'cet4')
+  if (!cet4) return
+  _nextTick(() => {
+    const tour = new Shepherd.Tour(TourConfig);
+    tour.addStep({
+      id: 'step2',
+      text: '选一本自己准备学习的词典',
+      attachTo: {element: '#cet4', on: 'bottom'},
+      buttons: [
+        {
+          text: `下一步（2/${TourConfig.total}）`,
+          action() {
+            localStorage.setItem('shepherd_step', 'step3');
+            tour.next()
+            selectDict({dict: cet4})
+          }
+        }
+      ]
+    });
+
+    const stepId = localStorage.getItem('shepherd_step');
+    if (stepId) {
+      // localStorage.removeItem('shepherd_step');
+      tour.start();
+      tour.show(stepId); // 直接跳到对应步骤
+    }
+  },)
 })
 
 </script>
@@ -91,31 +123,31 @@ const searchList = computed<any[]>(() => {
         <div class="py-1 flex flex-1 justify-end" v-else>
           <span class="page-title absolute w-full center">词典列表</span>
           <BaseIcon
-              title="搜索"
-              @click="showSearchInput = true"
-              class="z-1"
-              icon="fluent:search-24-regular">
+            title="搜索"
+            @click="showSearchInput = true"
+            class="z-1"
+            icon="fluent:search-24-regular">
             <IconFluentSearch24Regular/>
           </BaseIcon>
         </div>
       </div>
       <div class="mt-4" v-if="searchKey">
         <DictList
-            v-if="searchList.length "
-            @selectDict="selectDict"
-            :list="searchList"
-            quantifier="个词"
-            :select-id="'-1'"/>
+          v-if="searchList.length "
+          @selectDict="selectDict"
+          :list="searchList"
+          quantifier="个词"
+          :select-id="'-1'"/>
         <Empty v-else text="没有相关词典"/>
       </div>
       <div class="w-full" v-else>
         <DictGroup
-            v-for="item in groupedByCategoryAndTag"
-            :select-id="store.currentStudyWordDict.id"
-            @selectDict="selectDict"
-            quantifier="个词"
-            :groupByTag="item[1]"
-            :category="item[0]"
+          v-for="item in groupedByCategoryAndTag"
+          :select-id="store.currentStudyWordDict.id"
+          @selectDict="selectDict"
+          quantifier="个词"
+          :groupByTag="item[1]"
+          :category="item[0]"
         />
       </div>
     </div>
@@ -128,37 +160,37 @@ const searchList = computed<any[]>(() => {
   .dict-list-page {
     padding: 0.8rem;
     margin-bottom: 1rem;
-    
+
     .header-section {
       flex-direction: column;
       gap: 0.5rem;
-      
+
       .flex.flex-1.gap-4 {
         width: 100%;
-        
+
         .base-input {
           font-size: 0.9rem;
         }
-        
+
         .base-button {
           padding: 0.5rem 0.8rem;
           font-size: 0.9rem;
         }
       }
-      
+
       .py-1.flex.flex-1.justify-end {
         width: 100%;
-        
+
         .page-title {
           font-size: 1.2rem;
         }
-        
+
         .base-icon {
           font-size: 1.2rem;
         }
       }
     }
-    
+
     .mt-4 {
       margin-top: 0.8rem;
     }
@@ -169,24 +201,24 @@ const searchList = computed<any[]>(() => {
 @media (max-width: 480px) {
   .dict-list-page {
     padding: 0.5rem;
-    
+
     .header-section {
       .flex.flex-1.gap-4 {
         .base-input {
           font-size: 0.8rem;
         }
-        
+
         .base-button {
           padding: 0.4rem 0.6rem;
           font-size: 0.8rem;
         }
       }
-      
+
       .py-1.flex.flex-1.justify-end {
         .page-title {
           font-size: 1rem;
         }
-        
+
         .base-icon {
           font-size: 1rem;
         }

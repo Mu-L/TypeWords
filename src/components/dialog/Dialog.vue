@@ -175,6 +175,7 @@ async function cancel() {
           <div class="right">
             <BaseButton type="info" @click="cancel">{{ cancelButtonText }}</BaseButton>
             <BaseButton
+              id="dialog-ok"
                 :loading="confirmButtonLoading"
                 @click="ok">{{ confirmButtonText }}
             </BaseButton>
