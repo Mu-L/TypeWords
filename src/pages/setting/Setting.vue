@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from "vue";
-import { useSettingStore } from "@/stores/setting.ts";
-import { getAudioFileUrl, usePlayAudio } from "@/hooks/sound.ts";
-import { getShortcutKey, useEventListener } from "@/hooks/event.ts";
-import { checkAndUpgradeSaveDict, checkAndUpgradeSaveSetting, cloneDeep, loadJsLib, shakeCommonDict } from "@/utils";
-import { DefaultShortcutKeyMap, ShortcutKey, WordPracticeMode } from "@/types/types.ts";
+import {nextTick, onMounted, ref, watch} from "vue";
+import {useSettingStore} from "@/stores/setting.ts";
+import {getAudioFileUrl, usePlayAudio} from "@/hooks/sound.ts";
+import {getShortcutKey, useEventListener} from "@/hooks/event.ts";
+import {
+  checkAndUpgradeSaveDict,
+  checkAndUpgradeSaveSetting,
+  cloneDeep,
+  loadJsLib,
+  shakeCommonDict,
+  sleep
+} from "@/utils";
+import {DefaultShortcutKeyMap, ShortcutKey, WordPracticeMode} from "@/types/types.ts";
 import BaseButton from "@/components/BaseButton.vue";
 import VolumeIcon from "@/components/icon/VolumeIcon.vue";
-import { useBaseStore } from "@/stores/base.ts";
-import { saveAs } from "file-saver";
+import {useBaseStore} from "@/stores/base.ts";
+import {saveAs} from "file-saver";
 import {
   APP_NAME, APP_VERSION, EMAIL,
   EXPORT_DATA_KEY, GITHUB, Host,
@@ -20,7 +27,7 @@ import {
 import dayjs from "dayjs";
 import BasePage from "@/components/BasePage.vue";
 import Toast from '@/components/base/toast/Toast.ts'
-import { Option, Select } from "@/components/base/select";
+import {Option, Select} from "@/components/base/select";
 import Switch from "@/components/base/Switch.vue";
 import Slider from "@/components/base/Slider.vue";
 import RadioGroup from "@/components/base/radio/RadioGroup.vue";
@@ -29,10 +36,10 @@ import InputNumber from "@/components/base/InputNumber.vue";
 import PopConfirm from "@/components/PopConfirm.vue";
 import Textarea from "@/components/base/Textarea.vue";
 import SettingItem from "@/pages/setting/SettingItem.vue";
-import { get, set } from "idb-keyval";
-import { useRuntimeStore } from "@/stores/runtime.ts";
-import { useUserStore } from "@/stores/user.ts";
-import { useExport } from "@/hooks/export.ts";
+import {get, set} from "idb-keyval";
+import {useRuntimeStore} from "@/stores/runtime.ts";
+import {useUserStore} from "@/stores/user.ts";
+import {useExport} from "@/hooks/export.ts";
 import MigrateDialog from "@/components/MigrateDialog.vue";
 
 const emit = defineEmits<{
@@ -99,7 +106,7 @@ useEventListener('keydown', (e: KeyboardEvent) => {
     } else {
       // 忽略单独的修饰键
       if (shortcutKey === 'Ctrl+' || shortcutKey === 'Alt+' || shortcutKey === 'Shift+' ||
-          e.key === 'Control' || e.key === 'Alt' || e.key === 'Shift') {
+        e.key === 'Control' || e.key === 'Alt' || e.key === 'Shift') {
         return;
       }
 
@@ -174,6 +181,7 @@ let importLoading = $ref(false)
 const {loading: exportLoading, exportData} = useExport()
 
 function importJson(str: string, notice: boolean = true) {
+  importLoading = true
   let obj = {
     version: -1,
     val: {
@@ -223,10 +231,15 @@ function importJson(str: string, notice: boolean = true) {
     notice && Toast.success('导入成功！')
   } catch (err) {
     return Toast.error('导入失败！')
+  }finally {
+    importLoading = false
   }
 }
 
 async function importData(e) {
+  importLoading = true
+  await exportData('已自动备份数据', 'TypeWords数据备份.zip')
+  await sleep(1500)
   let file = e.target.files[0]
   if (!file) return
   if (file.name.endsWith(".json")) {
@@ -240,7 +253,6 @@ async function importData(e) {
     reader.readAsText(file);
   } else if (file.name.endsWith(".zip")) {
     try {
-      importLoading = true
       const JSZip = await loadJsLib('JSZip', `${Origin}/libs/jszip.min.js`);
       const zip = await JSZip.loadAsync(file);
 
@@ -276,6 +288,7 @@ async function importData(e) {
   } else {
     Toast.error("不支持的文件类型");
   }
+  importLoading = false
 }
 
 let isNewHost = $ref(window.location.host === Host)
@@ -335,7 +348,7 @@ function transferOk() {
                     <input ref="shortcutInput" :value="item[1]?item[1]:'未设置快捷键'" readonly type="text"
                            @blur="handleInputBlur">
                     <span @click.stop="editShortcutKey = ''">按键盘进行设置，<span
-                        class="text-red!">设置完成点击这里</span></span>
+                      class="text-red!">设置完成点击这里</span></span>
                   </div>
                   <div v-else>
                     <div v-if="item[1]">{{ item[1] }}</div>
@@ -362,7 +375,7 @@ function transferOk() {
 
             <div class="line my-3"></div>
 
-            <div>请注意，导入数据后将<b class="text-red"> 完全覆盖 </b>当前所有数据，请谨慎操作。
+            <div>请注意，导入数据后将<b class="text-red"> 完全覆盖 </b>当前所有数据，请谨慎操作。执行导入操作时，会先自动备份当前数据到您的电脑中，供您随时恢复
             </div>
             <div class="flex gap-space mt-3">
               <div class="import hvr-grow">
@@ -462,7 +475,7 @@ function transferOk() {
               <div class="mb-2">
                 <div>
                   <div>日期：2025/11/16</div>
-                  <div>内容：辨认单词时，不认识单词可以直接输入，自动标识为错误单词，无需按2</div>
+                  <div>内容：自测单词时，不认识单词可以直接输入，自动标识为错误单词，无需按2</div>
                 </div>
               </div>
             </div>
@@ -518,7 +531,7 @@ function transferOk() {
                   <ol>
                     <li>
                       <div class="title"><b>智能模式优化</b></div>
-                      <div class="desc">练习时新增四种练习模式：学习、辨认、听写、默写。</div>
+                      <div class="desc">练习时新增四种练习模式：学习、自测、听写、默写。</div>
                     </li>
                     <li>
                       <div class="title"><b>学习模式</b></div>
@@ -531,7 +544,7 @@ function transferOk() {
                       </div>
                     </li>
                     <li>
-                      <div class="title"><b>辨认模式（新增）</b></div>
+                      <div class="title"><b>自测模式（新增）</b></div>
                       <div class="desc">
                         <ul>
                           <li>仅在复习已学单词时出现。</li>
@@ -620,8 +633,8 @@ function transferOk() {
   </BasePage>
 
   <MigrateDialog
-      v-model="showTransfer"
-      @ok="transferOk"
+    v-model="showTransfer"
+    @ok="transferOk"
   />
 </template>
 

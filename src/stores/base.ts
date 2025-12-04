@@ -86,7 +86,6 @@ export const useBaseStore = defineStore('base', {
     },
     currentStudyProgress(): number {
       if (!this.sdict.length) return 0
-      if (this.sdict.complete) return 100
       return _getStudyProgress(this.sdict.lastLearnIndex, this.sdict.length)
     },
     getDictCompleteDate(): number {
@@ -191,11 +190,12 @@ export const useBaseStore = defineStore('base', {
       let rIndex = this.article.bookList.findIndex((v: Dict) => v.id === val.id)
       if (rIndex > -1) {
         this.article.studyIndex = rIndex
-        this.article.bookList[this.article.studyIndex] = getDefaultDict(val)
-        // this.article.bookList[this.article.studyIndex].articles = shallowReactive(val.articles)
-        // this.article.bookList[this.article.studyIndex].cover = val.cover
-        // this.article.bookList[this.article.studyIndex].name = val.name
-        // this.article.bookList[this.article.studyIndex].description = val.description
+        //不要整个等于，不然统计没了
+        // this.article.bookList[this.article.studyIndex] = getDefaultDict(val)
+        this.article.bookList[this.article.studyIndex].articles = shallowReactive(val.articles)
+        this.article.bookList[this.article.studyIndex].cover = val.cover
+        this.article.bookList[this.article.studyIndex].name = val.name
+        this.article.bookList[this.article.studyIndex].description = val.description
       } else {
         this.article.bookList.push(getDefaultDict(val))
         this.article.studyIndex = this.article.bookList.length - 1

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 
-import { _getAccomplishDays } from "@/utils";
+import {_getAccomplishDays} from "@/utils";
 import BaseButton from "@/components/BaseButton.vue";
 import Checkbox from "@/components/base/checkbox/Checkbox.vue";
 import Slider from "@/components/base/Slider.vue";
-import { defineAsyncComponent, watch } from "vue";
-import { useSettingStore } from "@/stores/setting.ts";
+import {defineAsyncComponent, watch} from "vue";
+import {useSettingStore} from "@/stores/setting.ts";
 import Toast from "@/components/base/toast/Toast.ts";
 import ChangeLastPracticeIndexDialog from "@/pages/word/components/ChangeLastPracticeIndexDialog.vue";
 import Tooltip from "@/components/base/Tooltip.vue";
-import { useRuntimeStore } from "@/stores/runtime.ts";
+import {useRuntimeStore} from "@/stores/runtime.ts";
+import BaseInput from "@/components/base/BaseInput.vue";
 
 const Dialog = defineAsyncComponent(() => import('@/components/dialog/Dialog.vue'))
 
@@ -56,9 +57,11 @@ watch(() => model.value, (n) => {
 </script>
 
 <template>
-  <Dialog v-model="model" title="学习设置" :footer="true"
+  <Dialog
+    v-model="model"
+    title="学习设置" :footer="true"
           @ok="changePerDayStudyNumber">
-    <div class="target-modal color-main"  id="mode">
+    <div class="target-modal color-main" id="mode">
       <div class="center">
         <div class="flex gap-4 text-center h-30 w-85">
           <div class="mode-item" :class="temPracticeMode == 0 && 'active'" @click=" temPracticeMode = 0">
@@ -71,15 +74,22 @@ watch(() => model.value, (n) => {
           </div>
         </div>
       </div>
-
-      <div class="text-center mt-2 mb-8">
-        <span>从第<span class="text-3xl mx-2 lh">{{ tempLastLearnIndex }}</span>个开始，</span>
-        <span>每日<span class="text-3xl mx-2 lh">{{ tempPerDayStudyNumber }}</span>个，</span>
+      <div class="text-center mt-4 mb-8 flex gap-1 items-end justify-center">
+        <span>从第</span>
+        <div class="w-18">
+          <BaseInput v-model="tempLastLearnIndex"/>
+        </div>
+        <span>个开始，每日</span>
+        <div class="w-18">
+          <BaseInput v-model="tempPerDayStudyNumber"/>
+        </div>
+        <span>个，</span>
         <span>预计<span
-          class="text-3xl mx-2 lh">{{
+          class="text-3xl mx-2 inner">{{
             _getAccomplishDays(runtimeStore.editDict.length - tempLastLearnIndex, tempPerDayStudyNumber)
           }}</span>天完成</span>
       </div>
+
       <div class="flex mb-4 gap-space">
         <span class="shrink-0">每日学习</span>
         <Slider :min="10"
@@ -121,18 +131,19 @@ watch(() => model.value, (n) => {
 <style scoped lang="scss">
 
 .target-modal {
-  width: 30rem;
+  width: 35rem;
   padding: 0 var(--space);
 
-  .lh {
+  :deep(.inner){
+    font-size: 2rem;
     color: rgb(176, 116, 211)
   }
 
-  .mode-item{
+  .mode-item {
     @apply w-50% border border-blue border-solid p-2 rounded-lg cursor-pointer;
   }
 
-  .active{
+  .active {
     @apply bg-blue color-white;
   }
 }
@@ -143,53 +154,53 @@ watch(() => model.value, (n) => {
     width: 90vw !important;
     max-width: 400px;
     padding: 0 1rem;
-    
+
     // 模式选择
     .center .flex.gap-4 {
       width: 100%;
       flex-direction: column;
       height: auto;
       gap: 0.8rem;
-      
+
       .mode-item {
         width: 100%;
         padding: 1rem;
-        
+
         .title {
           font-size: 1rem;
         }
-        
+
         .desc {
           font-size: 0.85rem;
           margin-top: 0.5rem;
         }
       }
     }
-    
+
     // 统计显示
     .text-center {
       font-size: 0.9rem;
-      
+
       .text-3xl {
         font-size: 1.5rem;
       }
     }
-    
+
     // 滑块控件
     .flex.mb-4, .flex.mb-6 {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;
-      
+
       span {
         width: 100%;
       }
-      
+
       .flex-1 {
         width: 100%;
       }
     }
-    
+
     // 按钮
     .base-button {
       width: 100%;
@@ -202,10 +213,10 @@ watch(() => model.value, (n) => {
   .target-modal {
     width: 95vw !important;
     padding: 0 0.5rem;
-    
+
     .text-center {
       font-size: 0.8rem;
-      
+
       .text-3xl {
         font-size: 1.2rem;
       }

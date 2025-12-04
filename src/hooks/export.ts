@@ -1,4 +1,4 @@
-import { loadJsLib, shakeCommonDict } from "@/utils";
+import {loadJsLib, shakeCommonDict} from "@/utils";
 import {
   APP_NAME,
   APP_VERSION,
@@ -10,13 +10,13 @@ import {
   SAVE_DICT_KEY,
   SAVE_SETTING_KEY
 } from "@/config/env.ts";
-import { get } from "idb-keyval";
-import { saveAs } from "file-saver";
+import {get} from "idb-keyval";
+import {saveAs} from "file-saver";
 import dayjs from "dayjs";
 import Toast from "@/components/base/toast/Toast.ts";
-import { useBaseStore } from "@/stores/base.ts";
-import { useSettingStore } from "@/stores/setting.ts";
-import { ref } from "vue";
+import {useBaseStore} from "@/stores/base.ts";
+import {useSettingStore} from "@/stores/setting.ts";
+import {ref} from "vue";
 
 export function useExport() {
   const store = useBaseStore()
@@ -24,7 +24,7 @@ export function useExport() {
 
   let loading = ref(false)
 
-  async function exportData(notice = '导出成功！') {
+  async function exportData(notice = '导出成功！', fileName = `${APP_NAME}-User-Data-${dayjs().format('YYYY-MM-DD HH-mm-ss')}.zip`) {
     if (loading.value) return
     loading.value = true
     try {
@@ -77,7 +77,7 @@ export function useExport() {
         mp3.file(rec.id + ".mp3", rec.file);
       }
       let content = await zip.generateAsync({type: "blob"})
-      saveAs(content, `${APP_NAME}-User-Data-${dayjs().format('YYYY-MM-DD HH-mm-ss')}.zip`);
+      saveAs(content, fileName);
       notice && Toast.success(notice)
       return content
     } catch (e) {

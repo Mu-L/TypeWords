@@ -216,7 +216,7 @@ const simpleWords = $computed({
             <div class="line"></div>
             <SettingItem mainTitle="自动切换"/>
             <SettingItem title="自动切换下一个单词"
-                         desc="仅在 **跟写** 时生效，听写、辨认、默写均不会自动切换，需要手动按 **空格键** 切换"
+                         desc="仅在 **跟写** 时生效，听写、自测、默写均不会自动切换，需要手动按 **空格键** 切换"
             >
               <Switch v-model="settingStore.autoNextWord"/>
             </SettingItem>

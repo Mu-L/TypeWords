@@ -222,7 +222,7 @@ async function onTyping(e: KeyboardEvent) {
     updateCurrentWordInfo();
     inputLock = false
   } else if (settingStore.wordPracticeType === WordPracticeType.Identify && !showWordResult) {
-    //当辨认模式下，按1和2会单独处理，如果按其他键则自动默认为不认识
+    //当自测模式下，按1和2会单独处理，如果按其他键则自动默认为不认识
     showWordResult = true
     emit('wrong')
     if (settingStore.wordSound) volumeIconRef?.play()
@@ -409,7 +409,7 @@ useEvents([
 <template>
   <div class="typing-word" ref="typingWordRef" v-if="word.word.length">
     <div class="flex flex-col items-center">
-      <div class="flex gap-1 mt-26">
+      <div class="flex gap-1 mt-30">
         <div class="phonetic"
              :class="!(!settingStore.dictation || showFullWord || showWordResult) && 'word-shadow'"
              v-if="settingStore.soundType === 'us' && word.phonetic0">[{{ word.phonetic0 }}]
@@ -481,7 +481,7 @@ useEvents([
     </div>
     <div class="other anim"
          v-opacity="![WordPracticeType.Listen,WordPracticeType.Dictation,WordPracticeType.Identify].includes(settingStore.wordPracticeType) || showFullWord || showWordResult">
-      <div class="line-white my-2"></div>
+      <div class="line-white my-3"></div>
       <template v-if="word?.sentences?.length">
         <div class="flex flex-col gap-3">
           <div class="sentence" v-for="item in word.sentences">
@@ -492,10 +492,10 @@ useEvents([
             </div>
           </div>
         </div>
-        <div class="line-white my-2 mb-5"></div>
       </template>
 
       <template v-if="word?.phrases?.length">
+        <div class="line-white my-3"></div>
         <div class="flex">
           <div class="label">短语</div>
           <div class="flex flex-col">
@@ -508,11 +508,11 @@ useEvents([
             </div>
           </div>
         </div>
-        <div class="line-white mt-3 mb-2"></div>
       </template>
 
       <template v-if="(settingStore.translate || !settingStore.dictation)">
         <template v-if="word?.synos?.length">
+          <div class="line-white my-3"></div>
           <div class="flex">
             <div class='label'>同近义词</div>
             <div class="flex flex-col gap-3">
@@ -531,13 +531,14 @@ useEvents([
               </div>
             </div>
           </div>
-          <div class="line-white my-2"></div>
         </template>
       </template>
 
       <div class="anim"
            v-opacity="(settingStore.translate && !settingStore.dictation) || showFullWord || showWordResult">
         <template v-if="word?.etymology?.length">
+          <div class="line-white my-3"></div>
+
           <div class="flex">
             <div class="label">词源</div>
             <div class="text-base">

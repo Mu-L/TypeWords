@@ -51,7 +51,7 @@ function getStepStr(step: number) {
       str += `默写新词`
       break
     case 3:
-      str += `辨认上次学习`
+      str += `自测上次学习`
       break
     case 4:
       str += '听写上次学习'
@@ -60,7 +60,7 @@ function getStepStr(step: number) {
       str += '默写上次学习'
       break
     case 6:
-      str += '辨认之前学习'
+      str += '自测之前学习'
       break
     case 7:
       str += '听写之前学习'
@@ -96,6 +96,11 @@ const progress = $computed(() => {
     </Tooltip>
 
     <div class="bottom">
+      <Progress :percentage="progress"
+                :stroke-width="8"
+                color="#69b1ff"
+                :show-text="false"/>
+
       <div class="flex justify-between items-center">
         <div class="stat">
           <div class="row">
@@ -246,7 +251,7 @@ const progress = $computed(() => {
 
   .arrow {
     position: absolute;
-    top: -60%;
+    top: -40%;
     left: 50%;
     cursor: pointer;
     transition: all .5s;
@@ -255,7 +260,7 @@ const progress = $computed(() => {
     font-size: 1.2rem;
 
     &.down {
-      top: -120%;
+      top: -90%;
       transform: rotate(90deg);
     }
   }

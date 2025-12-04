@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import BaseIcon from "@/components/BaseIcon.vue";
 import {
   _getAccomplishDate,
-  _getDictDataByUrl,
+  _getDictDataByUrl, _getStudyProgress,
   _nextTick,
   isMobile,
   loadJsLib,
@@ -446,9 +446,14 @@ let isNewHost = $ref(window.location.host === Host)
         </div>
       </div>
       <div class="flex gap-4 flex-wrap  mt-4">
-        <Book :is-add="false" quantifier="个词" :item="item" :checked="selectIds.includes(item.id)"
-              @check="() => toggleSelect(item)" :show-checkbox="isManageDict && j >= 3"
-              v-for="(item, j) in store.word.bookList" @click="goDictDetail(item)"/>
+        <Book :is-add="false"
+              quantifier="个词"
+              :item="item"
+              :checked="selectIds.includes(item.id)"
+              @check="() => toggleSelect(item)"
+              :show-checkbox="isManageDict && j >= 3"
+              v-for="(item, j) in store.word.bookList"
+              @click="goDictDetail(item)"/>
         <Book :is-add="true" @click="router.push('/dict-list')"/>
       </div>
     </div>

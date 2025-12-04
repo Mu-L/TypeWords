@@ -189,7 +189,7 @@ const sentence = $computed(() => {
 
             <div class="bg-gray-900/30 py-4 center flex-col rounded-2xl">
               <div class="text-center mb-2 text-xl">
-                我在 {{ APP_NAME }} 学习了 {{ studyStats.time }}
+                我学习了{{ studyStats.time }} {{ baseStore.sdict.name }}
               </div>
               <!-- Progress Overview -->
               <div class="w-90/100 flex items-center gap-space">

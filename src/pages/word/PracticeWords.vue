@@ -359,9 +359,9 @@ async function next(isTyping: boolean = true) {
           return goNextStep(shuffle(taskWords.write), WordPracticeType.Listen, '开始听写之前')
         }
 
-        //开始辨认之前
+        //开始自测之前
         if (statStore.step === 5) {
-          return goNextStep(taskWords.write, WordPracticeType.Identify, '开始辨认之前')
+          return goNextStep(taskWords.write, WordPracticeType.Identify, '开始自测之前')
         }
 
         //开始默写上次
@@ -374,9 +374,9 @@ async function next(isTyping: boolean = true) {
           return goNextStep(shuffle(taskWords.review), WordPracticeType.Listen, '开始听写上次')
         }
 
-        //开始辨认昨日
+        //开始自测昨日
         if (statStore.step === 2) {
-          return goNextStep(taskWords.review, WordPracticeType.Identify, '开始辨认昨日')
+          return goNextStep(taskWords.review, WordPracticeType.Identify, '开始自测昨日')
         }
 
         //开始默写新词

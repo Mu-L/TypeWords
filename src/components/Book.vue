@@ -21,13 +21,11 @@ defineEmits<{
 }>()
 
 const progress = $computed(() => {
-  if (props.item?.complete) return 100
   return Number(((props.item?.lastLearnIndex / props.item?.length) * 100).toFixed())
 })
 
 const studyProgress = $computed(() => {
   if (!props.showProgress) return
-  if (props.item.complete) return props.item?.length + '/'
   return props.item?.lastLearnIndex ? props.item?.lastLearnIndex + '/' : ''
 })
 </script>
@@ -41,14 +39,14 @@ const studyProgress = $computed(() => {
         <div>{{ studyProgress }}{{ item?.length }}{{ quantifier }}</div>
       </div>
       <div class="absolute bottom-2 left-3 right-3">
-        <Progress v-if="(item?.lastLearnIndex || item.complete) && showProgress" class="mt-1"
+        <Progress v-if="(item?.lastLearnIndex) && showProgress" class="mt-1"
                   :percentage="progress"
                   :show-text="false"></Progress>
       </div>
       <Checkbox v-if="showCheckbox"
                 :model-value="checked"
                 @change="$emit('check')"
-                class="absolute left-3 bottom-3"/>
+                class="absolute left-3 bottom-3 z-2"/>
       <div class="custom z-1" v-if="item.custom">自定义</div>
       <div class="custom bg-red! color-white z-1" v-else-if="item.update">更新中</div>
     </div>
