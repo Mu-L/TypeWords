@@ -10,7 +10,7 @@ interface IProps {
   showCheckbox?: boolean
   checked?: boolean
   showProgress?: boolean
-  isUser?: boolean
+  isUser?: boolean //是否是用户的词典
 }
 
 const props = withDefaults(defineProps<IProps>(), {
