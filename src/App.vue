@@ -25,7 +25,6 @@ let isInitializing = true // 标记是否正在初始化
 watch(store.$state, (n: BaseState) => {
   // 如果正在初始化，不保存数据，避免覆盖
   if (isInitializing) return
-  console.log('watch')
   let data = shakeCommonDict(n)
   set(SAVE_DICT_KEY.key, JSON.stringify({val: data, version: SAVE_DICT_KEY.version}))
 

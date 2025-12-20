@@ -80,6 +80,7 @@ declare module 'vue' {
     IconFluentDismiss20Regular: typeof import('~icons/fluent/dismiss20-regular')['default']
     IconFluentDismissCircle16Regular: typeof import('~icons/fluent/dismiss-circle16-regular')['default']
     IconFluentDismissCircle20Filled: typeof import('~icons/fluent/dismiss-circle20-filled')['default']
+    IconFluentDocument20Regular: typeof import('~icons/fluent/document20-regular')['default']
     IconFluentErrorCircle20Filled: typeof import('~icons/fluent/error-circle20-filled')['default']
     IconFluentErrorCircle20Regular: typeof import('~icons/fluent/error-circle20-regular')['default']
     IconFluentEye16Regular: typeof import('~icons/fluent/eye16-regular')['default']
