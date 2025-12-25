@@ -58,6 +58,11 @@ import {
 import { ToastInstance } from '@/components/base/toast/type.ts'
 import { watchOnce } from '@vueuse/core'
 import { setUserDictProp } from '@/apis'
+import BaseButton from '@/components/BaseButton.vue'
+import OptionButton from '@/components/base/OptionButton.vue'
+import Radio from '@/components/base/radio/Radio.vue'
+import RadioGroup from '@/components/base/radio/RadioGroup.vue'
+import GroupList from '@/pages/word/components/GroupList.vue'
 
 const { isWordCollect, toggleWordCollect, isWordSimple, toggleWordSimple } = useWordOptions()
 const settingStore = useSettingStore()
@@ -455,7 +460,7 @@ async function next(isTyping: boolean = true) {
         data.wrongWords = []
       } else {
         isTypingWrongWord.value = false
-        console.log('当前学完了，没错词', statStore.total, statStore.step, data.index)
+        console.log('当前学完了，没错词', statStore.total, statStore.stage, data.index)
 
         const complete = () => {
           console.log('全完学完了')
@@ -591,7 +596,6 @@ function repeat() {
   if (settingStore.wordPracticeMode === WordPracticeMode.Shuffle) {
     temp.shuffle = shuffle(temp.shuffle.filter(v => !ignoreList.includes(v.word)))
   } else {
-    if (settingStore.wordPracticeMode === WordPracticeMode.System) settingStore.dictation = false
     if (store.sdict.lastLearnIndex === 0 && store.sdict.complete) {
       //如果是刚刚完成，那么学习进度要从length减回去，因为lastLearnIndex为0了，同时改complete为false
       store.sdict.lastLearnIndex = store.sdict.length - statStore.newWordNumber
@@ -669,15 +673,14 @@ function togglePanel() {
 async function continueStudy() {
   let temp = cloneDeep(taskWords)
   //随机练习单独处理
-  if (taskWords.shuffle.length) {
+  if (settingStore.wordPracticeMode === WordPracticeMode.Shuffle) {
     let ignoreList = [store.allIgnoreWords, store.knownWords][settingStore.ignoreSimpleWord ? 0 : 1]
     temp.shuffle = shuffle(store.sdict.words.filter(v => !ignoreList.includes(v.word))).slice(
       0,
-      runtimeStore.routeData.total
+      runtimeStore.routeData.total ?? temp.shuffle.length
     )
     if (showStatDialog) showStatDialog = false
   } else {
-    if (settingStore.wordPracticeMode === WordPracticeMode.System) settingStore.dictation = false
     //这里判断是否显示结算弹框，如果显示了结算弹框的话，就不用加进度了
     if (!showStatDialog) {
       console.log('没学完，强行跳过')
@@ -690,6 +693,20 @@ async function continueStudy() {
   }
   emitter.emit(EventKey.resetWord)
   initData(temp)
+
+  if (AppEnv.CAN_REQUEST) {
+    let res = await setUserDictProp(null, { ...store.sdict, type: 'word' })
+    if (!res.success) {
+      Toast.error(res.msg)
+    }
+  }
+}
+
+async function jumpToGroup(group: number) {
+  console.log('没学完，强行跳过',group)
+  store.sdict.lastLearnIndex = (group - 1) * store.sdict.perDayStudyNumber
+  emitter.emit(EventKey.resetWord)
+  initData(getCurrentStudyWord())
 
   if (AppEnv.CAN_REQUEST) {
     let res = await setUserDictProp(null, { ...store.sdict, type: 'word' })
@@ -717,13 +734,7 @@ useEvents([
   [EventKey.repeatStudy, repeat],
   [EventKey.continueStudy, continueStudy],
   [EventKey.randomWrite, nextRandomWrite],
-  [
-    EventKey.changeDict,
-    () => {
-      initData(getCurrentStudyWord())
-    },
-  ],
-
+  [EventKey.changeDict, () => initData(getCurrentStudyWord())],
   [ShortcutKey.ShowWord, show],
   [ShortcutKey.Previous, prev],
   [ShortcutKey.Next, skip],
@@ -776,21 +787,29 @@ useEvents([
         />
       </div>
     </template>
+    共{{ Math.ceil(store.sdict.length / store.sdict.perDayStudyNumber) }}组
     <template v-slot:panel>
       <Panel>
         <template v-slot:title>
-          <!--          <span>{{ store.sdict.name }} ({{ data.index + 1 }} / {{ data.words.length }})</span>-->
-          <div class="center gap-space">
-            <span
-              >{{ store.sdict.name }} ({{ store.sdict.lastLearnIndex }} /
-              {{ store.sdict.length }})</span
-            >
-            <BaseIcon
-              @click="continueStudy"
-              :title="`下一组(${settingStore.shortcutKeyMap[ShortcutKey.NextChapter]})`"
-            >
-              <IconFluentArrowRight16Regular class="arrow" width="22" />
-            </BaseIcon>
+          <div class="center gap-1">
+            <span>{{ store.sdict.name }}</span>
+
+            <GroupList
+              @click="jumpToGroup"
+              v-if="settingStore.wordPracticeMode !== WordPracticeMode.Shuffle"
+            />
+
+            <template v-if="taskWords.new.length">
+
+
+              <BaseIcon
+                @click="continueStudy"
+                :title="`下一组(${settingStore.shortcutKeyMap[ShortcutKey.NextChapter]})`"
+              >
+                <IconFluentArrowRight16Regular class="arrow" width="22" />
+              </BaseIcon>
+            </template>
+
             <BaseIcon
               @click="randomWrite"
               :title="`随机默写(${settingStore.shortcutKeyMap[ShortcutKey.RandomWrite]})`"

@@ -23,7 +23,7 @@ provide('radioGroupValue', groupValue)
 provide('radioGroupDisabled', props.disabled)
 provide('updateRadioGroupValue', (val: string | number | boolean) => {
   if (props.disabled) return
-  groupValue.value = val
+  // groupValue.value = val
   emit('update:modelValue', val)
 })
 

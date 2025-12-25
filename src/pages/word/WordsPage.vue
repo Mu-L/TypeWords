@@ -6,6 +6,7 @@ import {
   _getAccomplishDate,
   _getDictDataByUrl,
   _nextTick,
+  cloneDeep,
   isMobile,
   loadJsLib,
   resourceWrap,
@@ -40,6 +41,7 @@ import { myDictList } from '@/apis'
 import PracticeWordListDialog from '@/pages/word/components/PracticeWordListDialog.vue'
 import ShufflePracticeSettingDialog from '@/pages/word/components/ShufflePracticeSettingDialog.vue'
 import { deleteDict } from '@/apis/dict.ts'
+import OptionButton from '@/components/base/OptionButton.vue'
 
 const store = useBaseStore()
 const settingStore = useSettingStore()
@@ -128,10 +130,11 @@ function startPractice(practiceMode?: WordPracticeMode): void {
       Toast.warning('没有单词可学习！')
       return
     }
+
+    //todo 临时处理
+    localStorage.removeItem(PracticeSaveWordKey.key)
     // 如果传入了独立模式，临时设置 wordPracticeMode
     if (practiceMode !== undefined) {
-      //todo 临时处理
-      localStorage.removeItem(PracticeSaveWordKey.key)
       settingStore.wordPracticeMode = practiceMode
     }
     window.umami?.track('startStudyWord', {
@@ -145,7 +148,6 @@ function startPractice(practiceMode?: WordPracticeMode): void {
     //把是否是第一次设置为false
     settingStore.first = false
     nav('practice-words/' + store.sdict.id, {}, { taskWords: currentStudy })
-    // 注意：不恢复 originalMode，因为练习过程中需要保持独立模式
   } else {
     window.umami?.track('no-dict')
     Toast.warning('请先选择一本词典')
@@ -202,7 +204,7 @@ function toggleSelect(item) {
 }
 
 const progressTextLeft = $computed(() => {
-  if (store.sdict.complete) return '已学完，进入总复习阶段'
+  if (store.sdict.complete) return '已学完，进入复习阶段'
   return '已学习' + store.currentStudyProgress + '%'
 })
 const progressTextRight = $computed(() => {
@@ -301,7 +303,10 @@ let isNewHost = $ref(window.location.host === Host)
               <span>已完成 {{ progressTextRight }} 词 / 共 {{ store.sdict.words.length }} 词</span>
               <span v-if="store.sdict.id">
                 预计完成日期：{{
-                  _getAccomplishDate(store.sdict.words.length - store.sdict.lastLearnIndex, store.sdict.perDayStudyNumber)
+                  _getAccomplishDate(
+                    store.sdict.words.length - store.sdict.lastLearnIndex,
+                    store.sdict.perDayStudyNumber
+                  )
                 }}
               </span>
             </div>
@@ -388,109 +393,53 @@ let isNewHost = $ref(window.location.host === Host)
           </div>
         </div>
         <div class="flex items-end mt-4 gap-4 btn-no-margin">
-          <BaseButton
-            size="large"
-            class="flex-1"
-            :disabled="!store.sdict.id"
-            :loading="loading"
-            @click="startPractice"
-            v-if="false"
-          >
-            <div class="flex items-center gap-2">
-              <span class="line-height-[2]">{{ isSaveData ? '继续学习' : '开始学习' }}</span>
-              <IconFluentArrowCircleRight16Regular class="text-xl" />
-            </div>
-          </BaseButton>
-
-          <div class="w-full flex box-border cp color-white">
-            <div
-              @click="startPractice()"
-              class="flex-1 rounded-l-lg center gap-2 py-1 bg-[var(--btn-primary)] transition-all duration-300 hover:opacity-50"
+          <OptionButton class="flex-2">
+            <BaseButton
+              size="large"
+              :disabled="!store.sdict.id"
+              :loading="loading"
+              @click="startPractice(WordPracticeMode.System)"
             >
-              <span class="line-height-[2]">{{ isSaveData ? '继续学习' : '开始学习' }}</span>
-              <IconFluentArrowCircleRight16Regular class="text-xl" />
-            </div>
-
-            <div class="relative group">
-              <div
-                class="w-10 rounded-r-lg h-full center bg-[var(--btn-primary)] hover:bg-gray border-solid border-2 border-l-gray border-transparent box-border transition-all duration-300"
-              >
-                <IconFluentChevronDown20Regular />
+              <div class="flex items-center gap-2">
+                <span class="line-height-[2]">{{ isSaveData ? '继续学习' : '开始学习' }}</span>
+                <IconFluentArrowCircleRight16Regular class="text-xl" />
               </div>
+            </BaseButton>
+            <template #options>
+              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.System)">
+                智能
+              </BaseButton>
+              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.FollowWriteOnly)">
+                跟写
+              </BaseButton>
+              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.IdentifyOnly)">
+                自测
+              </BaseButton>
+              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.ListenOnly)">
+                听写
+              </BaseButton>
+              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.DictationOnly)">
+                默写
+              </BaseButton>
+            </template>
+          </OptionButton>
 
-              <div
-                class="space-y-2 btn-no-margin pt-2 absolute z-2 right-0 border rounded opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
-              >
-                <BaseButton
-                  size="large"
-                  class="w-30"
-                  type="primary"
-                  @click="startPractice(WordPracticeMode.System)"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="line-height-[2]">智能</span>
-                  </div>
-                </BaseButton>
-                <BaseButton
-                  size="large"
-                  class="w-30"
-                  type="primary"
-                  @click="startPractice(WordPracticeMode.FollowWriteOnly)"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="line-height-[2]">跟写</span>
-                  </div>
-                </BaseButton>
-                <BaseButton
-                  size="large"
-                  class="w-30"
-                  type="primary"
-                  @click="startPractice(WordPracticeMode.IdentifyOnly)"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="line-height-[2]">自测</span>
-                  </div>
-                </BaseButton>
-                <BaseButton
-                  size="large"
-                  class="w-30"
-                  type="primary"
-                  @click="startPractice(WordPracticeMode.ListenOnly)"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="line-height-[2]">听写</span>
-                  </div>
-                </BaseButton>
-                <BaseButton
-                  size="large"
-                  class="w-30"
-                  type="primary"
-                  @click="startPractice(WordPracticeMode.DictationOnly)"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="line-height-[2]">默写</span>
-                  </div>
-                </BaseButton>
-              </div>
-            </div>
-          </div>
+          <OptionButton class="flex-1">
+            <BaseButton
+              size="large"
+              :loading="loading"
+              @click="startPractice(WordPracticeMode.Review, true)"
+            >
+              复习
+            </BaseButton>
+            <template #options>
+              <BaseButton @click="check(() => (showShufflePracticeSettingDialog = true))">
+                随机复习
+              </BaseButton>
+            </template>
+          </OptionButton>
 
-          <BaseButton
-            size="large"
-            :loading="loading"
-            @click="check(() => (showShufflePracticeSettingDialog = true))"
-          >
-            <div class="flex items-center gap-2">
-              <span class="line-height-[2]">随机复习</span>
-              <IconFluentArrowShuffle20Filled class="text-xl" />
-            </div>
-          </BaseButton>
-
-          <BaseButton
-            size="large"
-            :loading="loading"
-            @click="startPractice(WordPracticeMode.Free)"
-          >
+          <BaseButton size="large" :loading="loading" @click="startPractice(WordPracticeMode.Free)">
             <div class="flex items-center gap-2">
               <span class="line-height-[2]">自由练习</span>
               <IconStreamlineColorPenDrawFlat class="text-xl" />

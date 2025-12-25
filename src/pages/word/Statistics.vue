@@ -1,69 +1,68 @@
 <script setup lang="ts">
-import { useBaseStore } from "@/stores/base.ts";
-import BaseButton from "@/components/BaseButton.vue";
-import { ShortcutKey, Statistics, TaskWords } from "@/types/types.ts";
-import { emitter, EventKey, useEvents } from "@/utils/eventBus.ts";
-import { useSettingStore } from "@/stores/setting.ts";
-import { usePracticeStore } from "@/stores/practice.ts";
-import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
-import { defineAsyncComponent, inject, watch } from "vue";
+import { useBaseStore } from '@/stores/base.ts'
+import BaseButton from '@/components/BaseButton.vue'
+import { ShortcutKey, Statistics, TaskWords, WordPracticeMode } from '@/types/types.ts'
+import { emitter, EventKey, useEvents } from '@/utils/eventBus.ts'
+import { useSettingStore } from '@/stores/setting.ts'
+import { usePracticeStore } from '@/stores/practice.ts'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
+import { defineAsyncComponent, inject, watch } from 'vue'
 import isoWeek from 'dayjs/plugin/isoWeek'
-import { msToHourMinute } from "@/utils";
-import Progress from "@/components/base/Progress.vue";
-import ChannelIcons from "@/components/ChannelIcons/ChannelIcons.vue";
-import { AppEnv } from "@/config/env.ts";
-import { addStat } from "@/apis";
-import Toast from "@/components/base/toast/Toast.ts";
+import { msToHourMinute } from '@/utils'
+import Progress from '@/components/base/Progress.vue'
+import ChannelIcons from '@/components/ChannelIcons/ChannelIcons.vue'
+import { AppEnv } from '@/config/env.ts'
+import { addStat } from '@/apis'
+import Toast from '@/components/base/toast/Toast.ts'
 
 dayjs.extend(isoWeek)
-dayjs.extend(isBetween);
+dayjs.extend(isBetween)
 const Dialog = defineAsyncComponent(() => import('@/components/dialog/Dialog.vue'))
 
 const store = useBaseStore()
 const settingStore = useSettingStore()
 const statStore = usePracticeStore()
-const model = defineModel({default: false})
+const model = defineModel({ default: false })
 let list = $ref([])
 let dictIsEnd = $ref(false)
 let practiceTaskWords = inject<TaskWords>('practiceTaskWords')
 
 function calcWeekList() {
   // 获取本周的起止时间
-  const startOfWeek = dayjs().startOf('isoWeek'); // 周一
-  const endOfWeek = dayjs().endOf('isoWeek');     // 周日
+  const startOfWeek = dayjs().startOf('isoWeek') // 周一
+  const endOfWeek = dayjs().endOf('isoWeek') // 周日
   // 初始化 7 天的数组，默认 false
-  const weekList = Array(7).fill(false);
+  const weekList = Array(7).fill(false)
 
   store.sdict.statistics.forEach(item => {
-    const date = dayjs(item.startDate);
+    const date = dayjs(item.startDate)
     if (date.isBetween(startOfWeek, endOfWeek, null, '[]')) {
-      let idx = date.day();
+      let idx = date.day()
       // dayjs().day() 0=周日, 1=周一, ..., 6=周六
       // 需要转换为 0=周一, ..., 6=周日
       if (idx === 0) {
-        idx = 6; // 周日放到最后
+        idx = 6 // 周日放到最后
       } else {
-        idx = idx - 1; // 其余前移一位
+        idx = idx - 1 // 其余前移一位
       }
-      weekList[idx] = true;
+      weekList[idx] = true
     }
-  });
-  weekList[2] = true;
-  list = weekList;
+  })
+  list = weekList
 }
 
 // 监听 model 弹窗打开时重新计算
-watch(model, async (newVal) => {
+watch(model, async newVal => {
   if (newVal) {
-    dictIsEnd = false;
+    dictIsEnd = false
     let data: Statistics = {
       spend: statStore.spend,
       startDate: statStore.startDate,
       total: statStore.total,
       wrong: statStore.wrong,
       new: statStore.newWordNumber,
-      review: statStore.reviewWordNumber + statStore.writeWordNumber
+      review: statStore.reviewWordNumber + statStore.writeWordNumber,
     }
     window.umami?.track('endStudyWord', {
       name: store.sdict.name,
@@ -72,15 +71,28 @@ watch(model, async (newVal) => {
       perDayStudyNumber: store.sdict.perDayStudyNumber,
       custom: store.sdict.custom,
       complete: store.sdict.complete,
-      str: `name:${store.sdict.name},per:${store.sdict.perDayStudyNumber},spend:${Number(statStore.spend / 1000 / 60).toFixed(1)},index:${store.sdict.lastLearnIndex}`
+      str: `name:${store.sdict.name},per:${store.sdict.perDayStudyNumber},spend:${Number(statStore.spend / 1000 / 60).toFixed(1)},index:${store.sdict.lastLearnIndex}`,
     })
+    debugger
+
     //如果 shuffle 数组不为空，就说明是复习，不用修改 lastLearnIndex
-    if (!practiceTaskWords.shuffle.length) {
+    if (settingStore.wordPracticeMode !== WordPracticeMode.Shuffle) {
       store.sdict.lastLearnIndex = store.sdict.lastLearnIndex + statStore.newWordNumber
-      if (store.sdict.lastLearnIndex >= store.sdict.length) {
-        dictIsEnd = true;
+      //todo 这里计算不正确,因为有可能有单词被忽略,所以需要计算忽略的单词数
+      // 检查已忽略的单词数量，是否全部完成
+
+      let ignoreList = [store.allIgnoreWords, store.knownWords][
+        settingStore.ignoreSimpleWord ? 0 : 1
+      ]
+      // 忽略单词数
+      const ignoreCount = ignoreList.filter(word =>
+        store.sdict.words.some(w => w.word.toLowerCase() === word)
+      ).length
+      // 如果lastLearnIndex已经超过可学单词数，则判定完成
+      if (store.sdict.lastLearnIndex + ignoreCount >= store.sdict.length) {
+        dictIsEnd = true
         store.sdict.complete = true
-        store.sdict.lastLearnIndex = 0
+        store.sdict.lastLearnIndex = store.sdict.length
       }
     }
 
@@ -98,11 +110,11 @@ watch(model, async (newVal) => {
     }
 
     store.sdict.statistics.push(data as any)
-    calcWeekList(); // 新增：计算本周学习记录
+    calcWeekList() // 新增：计算本周学习记录
   }
 })
 
-const close = () => model.value = false
+const close = () => (model.value = false)
 
 useEvents([
   //特意注释掉，因为在练习界面用快捷键下一组时，需要判断是否在结算界面
@@ -143,8 +155,7 @@ const formattedStudyTime = $computed(() => {
   return time.replace('小时', 'h ').replace('分钟', 'm')
 })
 
-calcWeekList(); // 新增：计算本周学习记录
-
+calcWeekList() // 新增：计算本周学习记录
 </script>
 
 <template>
@@ -153,18 +164,16 @@ calcWeekList(); // 新增：计算本周学习记录
     :close-on-click-bg="false"
     :header="false"
     :keyboard="false"
-    :show-close="false">
+    :show-close="false"
+  >
     <div class="p-8 pr-3 bg-[var(--bg-card-primary)] rounded-2xl space-y-6">
       <!-- Header Section -->
       <div class="text-center relative">
         <div
-          class="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-purple-700 bg-clip-text text-transparent">
-          <template v-if="practiceTaskWords.shuffle.length">
-            🎯 随机复习完成
-          </template>
-          <template v-else>
-            🎉 今日任务完成
-          </template>
+          class="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-purple-700 bg-clip-text text-transparent"
+        >
+          <template v-if="practiceTaskWords.shuffle.length"> 🎯 复习完成 </template>
+          <template v-else> 🎉 今日任务完成 </template>
         </div>
         <p class="font-medium text-lg">{{ encouragementText }}</p>
       </div>
@@ -173,36 +182,37 @@ calcWeekList(); // 新增：计算本周学习记录
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <!-- Study Time -->
         <div class="item">
-          <IconFluentClock20Regular class="text-purple-500"/>
+          <IconFluentClock20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">学习时长</div>
           <div class="text-xl font-bold">{{ formattedStudyTime }}</div>
         </div>
 
         <!-- Accuracy Rate -->
         <div class="item">
-          <IconFluentTarget20Regular class="text-purple-500"/>
+          <IconFluentTarget20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">正确率</div>
           <div class="text-xl font-bold">{{ accuracyRate }}%</div>
         </div>
 
         <!-- New Words -->
         <div class="item">
-          <IconFluentSparkle20Regular class="text-purple-500"/>
+          <IconFluentSparkle20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">新词</div>
-          <div class="text-xl font-bold ">{{ statStore.newWordNumber }}</div>
+          <div class="text-xl font-bold">{{ statStore.newWordNumber }}</div>
         </div>
 
         <!-- New Words -->
         <div class="item">
-          <IconFluentBook20Regular class="text-purple-500"/>
+          <IconFluentBook20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">复习</div>
-          <div class="text-xl font-bold">{{ statStore.reviewWordNumber + statStore.writeWordNumber }}</div>
+          <div class="text-xl font-bold">
+            {{ statStore.reviewWordNumber + statStore.writeWordNumber }}
+          </div>
         </div>
       </div>
 
       <div class="w-full gap-3 flex">
         <div class="space-y-6 flex-1">
-
           <!-- Weekly Progress -->
           <div class="bg-[--bg-card-secend] rounded-xl p-2">
             <div class="text-center mb-4">
@@ -216,8 +226,10 @@ calcWeekList(); // 新增：计算本周学习记录
                 :class="item ? 'bg-green-500 text-white shadow-lg' : 'bg-white text-gray-700'"
               >
                 <div class="font-semibold mb-1">{{ i + 1 }}</div>
-                <div class="w-2 h-2 rounded-full mx-auto mb-1"
-                     :class="item ? 'bg-white bg-opacity-30' : 'bg-gray-300'"></div>
+                <div
+                  class="w-2 h-2 rounded-full mx-auto mb-1"
+                  :class="item ? 'bg-white bg-opacity-30' : 'bg-gray-300'"
+                ></div>
               </div>
             </div>
           </div>
@@ -228,44 +240,48 @@ calcWeekList(); // 新增：计算本周学习记录
               <div class="text-xl font-semibold">学习进度</div>
               <div class="text-2xl font-bold text-purple-600">{{ studyProgress }}%</div>
             </div>
-            <Progress :percentage="studyProgress" size="large" :show-text="false"/>
+            <Progress :percentage="studyProgress" size="large" :show-text="false" />
             <div class="flex justify-between text-sm font-medium mt-4">
               <span>已学习: {{ store.sdict.lastLearnIndex }}</span>
               <span>总词数: {{ store.sdict.length }}</span>
             </div>
           </div>
         </div>
-        <ChannelIcons/>
+        <ChannelIcons />
       </div>
       <!-- Action Buttons -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <BaseButton
           :keyboard="settingStore.shortcutKeyMap[ShortcutKey.RepeatChapter]"
-          @click="options(EventKey.repeatStudy)">
+          @click="options(EventKey.repeatStudy)"
+        >
           <div class="center gap-2">
-            <IconFluentArrowClockwise20Regular/>
+            <IconFluentArrowClockwise20Regular />
             重学一遍
           </div>
         </BaseButton>
         <BaseButton
           :keyboard="settingStore.shortcutKeyMap[ShortcutKey.NextChapter]"
-          @click="options(EventKey.continueStudy)">
+          @click="options(EventKey.continueStudy)"
+        >
           <div class="center gap-2">
-            <IconFluentPlay20Regular/>
+            <IconFluentPlay20Regular />
             {{ dictIsEnd ? '从头开始练习' : '再来一组' }}
           </div>
         </BaseButton>
+        <!--        todo 感觉这里的继续默写有问题，应该是当前组，而不是下一组-->
         <BaseButton
           :keyboard="settingStore.shortcutKeyMap[ShortcutKey.NextRandomWrite]"
-          @click="options(EventKey.randomWrite)">
+          @click="options(EventKey.randomWrite)"
+        >
           <div class="center gap-2">
-            <IconFluentPen20Regular/>
+            <IconFluentPen20Regular />
             继续默写
           </div>
         </BaseButton>
         <BaseButton @click="$router.back">
           <div class="center gap-2">
-            <IconFluentHome20Regular/>
+            <IconFluentHome20Regular />
             返回主页
           </div>
         </BaseButton>
@@ -274,7 +290,6 @@ calcWeekList(); // 新增：计算本周学习记录
   </Dialog>
 </template>
 <style scoped lang="scss">
-
 // 移动端适配
 @media (max-width: 768px) {
   // 弹窗容器优化
@@ -359,9 +374,7 @@ calcWeekList(); // 新增：计算本周学习记录
     }
   }
 }
-
 </style>
-
 
 <style scoped>
 .item {

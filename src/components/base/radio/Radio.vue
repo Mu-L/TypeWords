@@ -10,7 +10,7 @@
         :disabled="isDisabled"
     />
     <span class="radio__inner"></span>
-    <span class="radio__label">
+    <span class="text-sm">
       <slot>{{ label }}</slot>
     </span>
   </label>
@@ -83,11 +83,7 @@ function onClick() {
       transition: transform 0.2s ease-in-out;
     }
   }
-
-  .radio__label {
-    font-size: 14px;
-    color: #606266;
-  }
+ 
 
   &.is-checked {
     .radio__inner {

@@ -31,13 +31,11 @@ let show = $ref(false)
 let tempPerDayStudyNumber = $ref(0)
 let tempWordReviewRatio = $ref(0)
 let tempLastLearnIndex = $ref(0)
-let temPracticeMode = $ref(0)
 let tempDisableShowPracticeSettingDialog = $ref(false)
 
 function changePerDayStudyNumber() {
   runtimeStore.editDict.perDayStudyNumber = tempPerDayStudyNumber
   runtimeStore.editDict.lastLearnIndex = tempLastLearnIndex
-  settings.wordPracticeMode = temPracticeMode
   settings.wordReviewRatio = tempWordReviewRatio
   settings.disableShowPracticeSettingDialog = tempDisableShowPracticeSettingDialog
   emit('ok')
@@ -50,7 +48,6 @@ watch(
       if (runtimeStore.editDict.id) {
         tempPerDayStudyNumber = runtimeStore.editDict.perDayStudyNumber
         tempLastLearnIndex = runtimeStore.editDict.lastLearnIndex
-        temPracticeMode = settings.wordPracticeMode
         tempWordReviewRatio = settings.wordReviewRatio
         tempDisableShowPracticeSettingDialog = settings.disableShowPracticeSettingDialog
       } else {
@@ -64,27 +61,6 @@ watch(
 <template>
   <Dialog v-model="model" title="学习设置" padding :footer="true" @ok="changePerDayStudyNumber">
     <div class="target-modal color-main" id="mode">
-      <div class="center">
-        <div class="flex gap-4 text-center h-30 w-85">
-          <div
-            class="mode-item"
-            :class="temPracticeMode == 0 && 'active'"
-            @click="temPracticeMode = 0"
-          >
-            <div class="title text-align-center">智能模式</div>
-            <div class="desc mt-2">自动规划学习、复习、听写、默写</div>
-          </div>
-          <div
-            class="mode-item"
-            :class="temPracticeMode == 1 && 'active'"
-            @click="temPracticeMode = 1"
-          >
-            <div class="title">自由模式</div>
-            <div class="desc mt-2">自由练习，系统不强制复习与默写</div>
-          </div>
-        </div>
-      </div>
-
       <div class="text-center mt-4">
         <span
           >共<span class="target-number">{{ runtimeStore.editDict.length }}</span
@@ -179,7 +155,7 @@ watch(
 <style scoped lang="scss">
 .target-modal {
   width: 35rem;
- 
+
 
   .mode-item {
     @apply w-50% border border-blue border-solid p-2 rounded-lg cursor-pointer;

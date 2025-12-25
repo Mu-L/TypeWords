@@ -2,14 +2,17 @@
 import { inject, Ref } from 'vue'
 import { usePracticeStore } from '@/stores/practice.ts'
 import { useSettingStore } from '@/stores/setting.ts'
-import { PracticeData, ShortcutKey, WordPracticeModeStageMap, WordPracticeStage, WordPracticeStageNameMap } from '@/types/types.ts'
+import { PracticeData, ShortcutKey,
+  WordPracticeMode, WordPracticeModeStageMap, WordPracticeStage, WordPracticeStageNameMap } from '@/types/types.ts'
 import BaseIcon from '@/components/BaseIcon.vue'
 import Tooltip from '@/components/base/Tooltip.vue'
 import Progress from '@/components/base/Progress.vue'
 import SettingDialog from '@/components/setting/SettingDialog.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import { useBaseStore } from '@/stores/base.ts'
 
 const statStore = usePracticeStore()
+const store = useBaseStore()
 const settingStore = useSettingStore()
 
 defineProps<{
@@ -34,6 +37,7 @@ function format(val: number, suffix: string = '', check: number = -1) {
 }
 
 const status = $computed(() => {
+  if (settingStore.wordPracticeMode === WordPracticeMode.Free) return '自由练习'
   if (isTypingWrongWord.value) return '复习错词'
   return statStore.getStageName
 })
@@ -85,9 +89,8 @@ const progress = $computed(() => {
         </div>
         <div class="flex gap-2 justify-center items-center" id="toolbar-icons">
           <SettingDialog type="word" />
-
           <BaseIcon
-            v-if="statStore.step < 9"
+            v-if="settingStore.wordPracticeMode !== WordPracticeMode.Free"
             @click="emit('skipStep')"
             :title="`跳到下一阶段:${WordPracticeStageNameMap[statStore.nextStage]}`"
           >
