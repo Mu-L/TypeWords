@@ -63,11 +63,11 @@ watch(
     <div class="target-modal color-main" id="mode">
       <div class="text-center mt-4">
         <span
-          >共<span class="target-number">{{ runtimeStore.editDict.length }}</span
+          >共<span class="target-number mx-2">{{ runtimeStore.editDict.length }}</span
           >个单词，</span
         >
         <span
-          >预计<span class="target-number">{{
+          >预计<span class="target-number mx-2">{{
             _getAccomplishDays(
               runtimeStore.editDict.length - tempLastLearnIndex,
               tempPerDayStudyNumber
@@ -87,23 +87,30 @@ watch(
           <BaseInput class="target-number" v-model="tempPerDayStudyNumber" />
         </div>
         <span>个新词</span>
-        <template v-if="temPracticeMode === 0">
-          <span>，复习</span>
-          <div class="target-number">
-            {{ tempPerDayStudyNumber * tempWordReviewRatio }}
-          </div>
-          <span>个</span>
-        </template>
+        <span>，复习</span>
+        <div class="target-number mx-2">
+          {{ tempPerDayStudyNumber * tempWordReviewRatio }}
+        </div>
+        <span>个</span>
       </div>
 
-      <div class="flex mb-4 gap-space" v-if="temPracticeMode === 0">
-        <Tooltip title="复习词与新词的比例">
-          <div class="flex items-center gap-1 w-20">
-            <span>复习比</span>
-            <IconFluentQuestionCircle20Regular />
+      <div class="mb-4 space-y-2">
+        <div class="flex items-center gap-space">
+          <Tooltip title="复习词与新词的比例">
+            <div class="flex items-center gap-1 w-20 break-keep">
+              <span>复习比</span>
+              <IconFluentQuestionCircle20Regular />
+            </div>
+          </Tooltip>
+          <InputNumber :min="0" :max="10" v-model="tempWordReviewRatio" />
+        </div>
+        <div class="flex" v-if="!tempWordReviewRatio">
+          <div class="w-23 flex-shrink-0"></div>
+          <div class="text-sm text-gray-500">
+            <div>未完成学习时，复习数量按照设置的复习比生成，为0则不复习</div>
+            <div>完成学习后，新词数量固定为0，复习数量按照比例生成（若复习比小于1，以 1 计算）</div>
           </div>
-        </Tooltip>
-        <InputNumber :min="0" :max="10" v-model="tempWordReviewRatio" />
+        </div>
       </div>
 
       <div class="flex mb-4 gap-space">
@@ -155,7 +162,6 @@ watch(
 <style scoped lang="scss">
 .target-modal {
   width: 35rem;
-
 
   .mode-item {
     @apply w-50% border border-blue border-solid p-2 rounded-lg cursor-pointer;

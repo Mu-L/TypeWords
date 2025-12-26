@@ -138,7 +138,7 @@ watch(dict_list, (val) => {
             v-if="searchList.length "
             @selectDict="selectDict"
             :list="searchList"
-            quantifier="个词"
+            quantifier="词"
             :select-id="'-1'"/>
         <Empty v-else text="没有相关词典"/>
       </div>
@@ -147,7 +147,7 @@ watch(dict_list, (val) => {
             v-for="item in groupedByCategoryAndTag"
             :select-id="store.sdict.id"
             @selectDict="selectDict"
-            quantifier="个词"
+            quantifier="词"
             :groupByTag="item[1]"
             :category="item[0]"
         />

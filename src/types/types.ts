@@ -349,3 +349,14 @@ export const WordPracticeStageNameMap: Record<WordPracticeStage, string> = {
   [WordPracticeStage.Complete]: '完成学习',
   [WordPracticeStage.Shuffle]: '随机复习',
 }
+
+export const WordPracticeModeNameMap: Record<WordPracticeMode, string> = {
+  [WordPracticeMode.System]: '智能学习',
+  [WordPracticeMode.Free]: '自由',
+  [WordPracticeMode.IdentifyOnly]: '自测',
+  [WordPracticeMode.DictationOnly]: '默写',
+  [WordPracticeMode.ListenOnly]: '听写',
+  [WordPracticeMode.FollowWriteOnly]: '跟写',
+  [WordPracticeMode.Shuffle]: '随机复习',
+  [WordPracticeMode.Review]: '复习',
+}

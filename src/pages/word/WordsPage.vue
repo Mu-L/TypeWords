@@ -14,7 +14,7 @@ import {
   useNav,
 } from '@/utils'
 import BasePage from '@/components/BasePage.vue'
-import { DictResource, WordPracticeMode } from '@/types/types.ts'
+import { DictResource, WordPracticeMode, WordPracticeModeNameMap } from '@/types/types.ts'
 import { watch } from 'vue'
 import { getCurrentStudyWord } from '@/hooks/dict.ts'
 import { useRuntimeStore } from '@/stores/runtime.ts'
@@ -204,12 +204,8 @@ function toggleSelect(item) {
 }
 
 const progressTextLeft = $computed(() => {
-  if (store.sdict.complete) return '已学完，进入复习阶段'
-  return '已学习' + store.currentStudyProgress + '%'
-})
-const progressTextRight = $computed(() => {
-  // if (store.sdict.complete) return store.sdict?.length
-  return store.sdict?.lastLearnIndex
+  if (store.sdict.complete) return '已学完，进入总复习阶段'
+  return '当前进度：已学' + store.currentStudyProgress + '%'
 })
 
 function check(cb: Function) {
@@ -258,6 +254,7 @@ async function onShufflePracticeSettingOk(total) {
 async function saveLastPracticeIndex(e) {
   Toast.success('修改成功')
   runtimeStore.editDict.lastLearnIndex = e
+  // runtimeStore.editDict.complete = e >= runtimeStore.editDict.length - 1
   showChangeLastPracticeIndexDialog = false
   isSaveData = false
   localStorage.removeItem(PracticeSaveWordKey.key)
@@ -292,16 +289,9 @@ let isNewHost = $ref(window.location.host === Host)
         </div>
 
         <template v-if="store.sdict.id">
-          <div class="mt-4 flex flex-col gap-2">
-            <div class="">当前进度：{{ progressTextLeft }}</div>
-            <Progress
-              size="large"
-              :percentage="store.currentStudyProgress"
-              :show-text="false"
-            ></Progress>
+          <div class="mt-4 space-y-2">
             <div class="text-sm flex justify-between">
-              <span>已完成 {{ progressTextRight }} 词 / 共 {{ store.sdict.words.length }} 词</span>
-              <span v-if="store.sdict.id">
+              <span v-opacity="store.sdict.id && store.sdict.lastLearnIndex < store.sdict.length">
                 预计完成日期：{{
                   _getAccomplishDate(
                     store.sdict.words.length - store.sdict.lastLearnIndex,
@@ -309,6 +299,16 @@ let isNewHost = $ref(window.location.host === Host)
                   )
                 }}
               </span>
+            </div>
+            <Progress
+              size="large"
+              :percentage="store.currentStudyProgress"
+              :show-text="false"
+            ></Progress>
+
+            <div class="text-sm flex justify-between">
+              <span>{{ progressTextLeft }}</span>
+              <span> {{ store.sdict?.lastLearnIndex }} / {{ store.sdict.words.length }} 词</span>
             </div>
           </div>
           <div class="flex items-center mt-4 gap-4">
@@ -398,37 +398,54 @@ let isNewHost = $ref(window.location.host === Host)
               size="large"
               :disabled="!store.sdict.id"
               :loading="loading"
-              @click="startPractice(WordPracticeMode.System)"
+              @click="startPractice(settingStore.wordPracticeMode)"
             >
               <div class="flex items-center gap-2">
-                <span class="line-height-[2]">{{ isSaveData ? '继续学习' : '开始学习' }}</span>
+                <span class="line-height-[2]">{{
+                  isSaveData
+                    ? `继续${WordPracticeModeNameMap[settingStore.wordPracticeMode]}`
+                    : `开始${WordPracticeModeNameMap[settingStore.wordPracticeMode]}`
+                }}</span>
                 <IconFluentArrowCircleRight16Regular class="text-xl" />
               </div>
             </BaseButton>
             <template #options>
-              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.System)">
-                智能
+              <BaseButton
+                class="w-23"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.System"
+                @click="startPractice(WordPracticeMode.System)"
+              >
+                {{ WordPracticeModeNameMap[WordPracticeMode.System] }}
               </BaseButton>
-              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.FollowWriteOnly)">
-                跟写
+              <BaseButton
+                class="w-23"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.IdentifyOnly"
+                @click="startPractice(WordPracticeMode.IdentifyOnly)"
+              >
+                {{ WordPracticeModeNameMap[WordPracticeMode.IdentifyOnly] }}
               </BaseButton>
-              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.IdentifyOnly)">
-                自测
+              <BaseButton
+                class="w-23"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.ListenOnly"
+                @click="startPractice(WordPracticeMode.ListenOnly)"
+              >
+                {{ WordPracticeModeNameMap[WordPracticeMode.ListenOnly] }}
               </BaseButton>
-              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.ListenOnly)">
-                听写
-              </BaseButton>
-              <BaseButton class="w-20" @click="startPractice(WordPracticeMode.DictationOnly)">
-                默写
+              <BaseButton
+                class="w-23"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.DictationOnly"
+                @click="startPractice(WordPracticeMode.DictationOnly)"
+              >
+                {{ WordPracticeModeNameMap[WordPracticeMode.DictationOnly] }}
               </BaseButton>
             </template>
           </OptionButton>
 
-          <OptionButton class="flex-1">
+          <OptionButton class="flex-1" v-if="currentStudy.new.length">
             <BaseButton
               size="large"
               :loading="loading"
-              @click="startPractice(WordPracticeMode.Review, true)"
+              @click="startPractice(WordPracticeMode.Review)"
             >
               复习
             </BaseButton>
@@ -438,6 +455,13 @@ let isNewHost = $ref(window.location.host === Host)
               </BaseButton>
             </template>
           </OptionButton>
+          <BaseButton
+            v-else
+            size="large"
+            @click="check(() => (showShufflePracticeSettingDialog = true))"
+          >
+            随机复习
+          </BaseButton>
 
           <BaseButton size="large" :loading="loading" @click="startPractice(WordPracticeMode.Free)">
             <div class="flex items-center gap-2">
@@ -483,7 +507,7 @@ let isNewHost = $ref(window.location.host === Host)
       <div class="flex gap-4 flex-wrap mt-4">
         <Book
           :is-add="false"
-          quantifier="个词"
+          quantifier="词"
           :item="item"
           :checked="selectIds.includes(item.id)"
           @check="() => toggleSelect(item)"
@@ -506,7 +530,7 @@ let isNewHost = $ref(window.location.host === Host)
       <div class="flex gap-4 flex-wrap mt-4 min-h-50">
         <Book
           :is-add="false"
-          quantifier="个词"
+          quantifier="词"
           :item="item as any"
           v-for="(item, j) in recommendDictList"
           @click="goDictDetail(item as any)"

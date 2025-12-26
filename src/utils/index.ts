@@ -1,16 +1,16 @@
-import { BaseState, getDefaultBaseState, useBaseStore } from "@/stores/base.ts";
-import { getDefaultSettingState, SettingState } from "@/stores/setting.ts";
-import { Dict, DictId, DictResource, DictType } from "@/types/types.ts";
-import { useRouter } from "vue-router";
-import { useRuntimeStore } from "@/stores/runtime.ts";
+import { BaseState, getDefaultBaseState, useBaseStore } from '@/stores/base.ts'
+import { getDefaultSettingState, SettingState } from '@/stores/setting.ts'
+import { Dict, DictId, DictResource, DictType } from '@/types/types.ts'
+import { useRouter } from 'vue-router'
+import { useRuntimeStore } from '@/stores/runtime.ts'
 import dayjs from 'dayjs'
-import { AppEnv, RESOURCE_PATH, SAVE_DICT_KEY, SAVE_SETTING_KEY } from "@/config/env.ts";
-import { nextTick } from "vue";
+import { AppEnv, RESOURCE_PATH, SAVE_DICT_KEY, SAVE_SETTING_KEY } from '@/config/env.ts'
+import { nextTick } from 'vue'
 import Toast from '@/components/base/toast/Toast.ts'
-import { getDefaultDict, getDefaultWord } from "@/types/func.ts";
-import duration from "dayjs/plugin/duration";
+import { getDefaultDict, getDefaultWord } from '@/types/func.ts'
+import duration from 'dayjs/plugin/duration'
 
-dayjs.extend(duration);
+dayjs.extend(duration)
 
 export function no() {
   Toast.warning('未现实')
@@ -60,7 +60,9 @@ export function checkAndUpgradeSaveDict(val: any) {
         return defaultState
       } else {
         // 版本不匹配时，尽量保留数据而不是直接返回默认状态
-        console.warn(`数据版本不匹配: 当前版本 ${version}, 期望版本 ${SAVE_DICT_KEY.version}，尝试保留数据`)
+        console.warn(
+          `数据版本不匹配: 当前版本 ${version}, 期望版本 ${SAVE_DICT_KEY.version}，尝试保留数据`
+        )
         try {
           checkRiskKey(defaultState, state)
           // 尝试保留 bookList 数据
@@ -133,7 +135,8 @@ export function checkAndUpgradeSaveSetting(val: any) {
 export function shakeCommonDict(n: BaseState): BaseState {
   let data: BaseState = cloneDeep(n)
   data.word.bookList.map((v: Dict) => {
-    if (!v.custom && ![DictId.wordKnown, DictId.wordWrong, DictId.wordCollect].includes(v.id)) v.words = []
+    if (!v.custom && ![DictId.wordKnown, DictId.wordWrong, DictId.wordCollect].includes(v.id))
+      v.words = []
   })
   data.article.bookList.map((v: Dict) => {
     if (!v.custom && ![DictId.articleCollect].includes(v.id)) v.articles = []
@@ -159,10 +162,10 @@ export function useNav() {
     if (data) {
       runtimeStore.routeData = cloneDeep(data)
     }
-    router.push({path, query})
+    router.push({ path, query })
   }
 
-  return {nav, push: nav, back: router.back}
+  return { nav, push: nav, back: router.back }
 }
 
 export function _dateFormat(val: any, format: string = 'YYYY/MM/DD HH:mm'): string {
@@ -175,17 +178,17 @@ export function _dateFormat(val: any, format: string = 'YYYY/MM/DD HH:mm'): stri
 }
 
 export function msToHourMinute(ms) {
-  const d = dayjs.duration(ms);
-  const hours = d.hours();
-  const minutes = d.minutes();
-  const seconds = d.seconds();
-  if (hours) return `${hours}小时${minutes}分钟`;
-  if (minutes) return `${minutes}分钟`;
-  return `${seconds}秒`;
+  const d = dayjs.duration(ms)
+  const hours = d.hours()
+  const minutes = d.minutes()
+  const seconds = d.seconds()
+  if (hours) return `${hours}小时${minutes}分钟`
+  if (minutes) return `${minutes}分钟`
+  return `${seconds}秒`
 }
 
 export function msToMinute(ms) {
-  return `${Math.floor(dayjs.duration(ms).asMinutes())}分钟`;
+  return `${Math.floor(dayjs.duration(ms).asMinutes())}分钟`
 }
 
 //获取完成天数
@@ -218,44 +221,47 @@ export function _copy(val: string) {
   navigator.clipboard.writeText(val)
 }
 
-export function _parseLRC(lrc: string): { start: number, end: number, text: string }[] {
-  const lines = lrc.split("\n").filter(line => line.trim() !== "");
-  const regex = /\[(\d{2}):(\d{2}\.\d{2})\](.*)/;
-  let parsed: any = [];
+export function _parseLRC(lrc: string): { start: number; end: number; text: string }[] {
+  const lines = lrc.split('\n').filter(line => line.trim() !== '')
+  const regex = /\[(\d{2}):(\d{2}\.\d{2})\](.*)/
+  let parsed: any = []
 
   for (let i = 0; i < lines.length; i++) {
-    let match = lines[i].match(regex);
+    let match = lines[i].match(regex)
     if (match) {
-      let start = parseFloat(match[1]) * 60 + parseFloat(match[2]); // 转换成秒
-      let text = match[3].trim();
+      let start = parseFloat(match[1]) * 60 + parseFloat(match[2]) // 转换成秒
+      let text = match[3].trim()
 
       // 计算结束时间（下一个时间戳）
-      let nextMatch = lines[i + 1] ? lines[i + 1].match(regex) : null;
-      let end = nextMatch ? parseFloat(nextMatch[1]) * 60 + parseFloat(nextMatch[2]) : null;
+      let nextMatch = lines[i + 1] ? lines[i + 1].match(regex) : null
+      let end = nextMatch ? parseFloat(nextMatch[1]) * 60 + parseFloat(nextMatch[2]) : null
 
-      parsed.push({start, end, text});
+      parsed.push({ start, end, text })
     }
   }
 
-  return parsed;
+  return parsed
 }
 
 export async function sleep(time: number) {
-  return new Promise(resolve => setTimeout(resolve, time));
+  return new Promise(resolve => setTimeout(resolve, time))
 }
 
-export async function _getDictDataByUrl(val: DictResource, type: DictType = DictType.word): Promise<Dict> {
+export async function _getDictDataByUrl(
+  val: DictResource,
+  type: DictType = DictType.word
+): Promise<Dict> {
   // await sleep(2000);
   let dictResourceUrl = `/dicts/${val.language}/word/${val.url}`
   if (type === DictType.article) {
-    dictResourceUrl = `/dicts/${val.language}/article/${val.url}`;
+    dictResourceUrl = `/dicts/${val.language}/article/${val.url}`
   }
   let s = await fetch(resourceWrap(dictResourceUrl, val.version)).then(r => r.json())
   if (s) {
     if (type === DictType.word) {
-      return getDefaultDict({...val, words: s})
+      return getDefaultDict({ ...val, words: s })
     } else {
-      return getDefaultDict({...val, articles: s})
+      return getDefaultDict({ ...val, articles: s })
     }
   }
   return getDefaultDict()
@@ -263,97 +269,97 @@ export async function _getDictDataByUrl(val: DictResource, type: DictType = Dict
 
 //从字符串里面转换为Word格式
 export function convertToWord(raw: any) {
-  const safeString = (str) => (typeof str === 'string' ? str.trim() : '');
+  const safeString = str => (typeof str === 'string' ? str.trim() : '')
   const safeSplit = (str, sep) =>
-    safeString(str) ? safeString(str).split(sep).filter(Boolean) : [];
+    safeString(str) ? safeString(str).split(sep).filter(Boolean) : []
 
   // 1. trans
   const trans = safeSplit(raw.trans, '\n').map(line => {
-    const match = safeString(line).match(/^([^\s.]+\.?)\s*(.*)$/);
+    const match = safeString(line).match(/^([^\s.]+\.?)\s*(.*)$/)
     if (match) {
-      let pos = safeString(match[1]);
-      let cn = safeString(match[2]);
+      let pos = safeString(match[1])
+      let cn = safeString(match[2])
 
       // 如果 pos 不是常规词性（不以字母开头），例如 "【名】"
       if (!/^[a-zA-Z]+\.?$/.test(pos)) {
-        cn = safeString(line); // 整行放到 cn
-        pos = ''; // pos 置空
+        cn = safeString(line) // 整行放到 cn
+        pos = '' // pos 置空
       }
 
-      return {pos, cn};
+      return { pos, cn }
     }
-    return {pos: '', cn: safeString(line)};
-  });
+    return { pos: '', cn: safeString(line) }
+  })
 
   // 2. sentences
   const sentences = safeSplit(raw.sentences, '\n\n').map(block => {
-    const [c, cn] = block.split('\n');
-    return {c: safeString(c), cn: safeString(cn)};
-  });
+    const [c, cn] = block.split('\n')
+    return { c: safeString(c), cn: safeString(cn) }
+  })
 
   // 3. phrases
   const phrases = safeSplit(raw.phrases, '\n\n').map(block => {
-    const [c, cn] = block.split('\n');
-    return {c: safeString(c), cn: safeString(cn)};
-  });
+    const [c, cn] = block.split('\n')
+    return { c: safeString(c), cn: safeString(cn) }
+  })
 
   // 4. synos
   const synos = safeSplit(raw.synos, '\n\n').map(block => {
-    const lines = block.split('\n').map(safeString);
-    const [posCn, wsStr] = lines;
-    let pos = '';
-    let cn = '';
+    const lines = block.split('\n').map(safeString)
+    const [posCn, wsStr] = lines
+    let pos = ''
+    let cn = ''
 
     if (posCn) {
-      const posMatch = posCn.match(/^([a-zA-Z.]+)(.*)$/);
-      pos = posMatch ? safeString(posMatch[1]) : '';
-      cn = posMatch ? safeString(posMatch[2]) : safeString(posCn);
+      const posMatch = posCn.match(/^([a-zA-Z.]+)(.*)$/)
+      pos = posMatch ? safeString(posMatch[1]) : ''
+      cn = posMatch ? safeString(posMatch[2]) : safeString(posCn)
     }
-    const ws = wsStr ? wsStr.split('/').map(safeString) : [];
+    const ws = wsStr ? wsStr.split('/').map(safeString) : []
 
-    return {pos, cn, ws};
-  });
+    return { pos, cn, ws }
+  })
 
   // 5. relWords
-  const relWordsText = safeString(raw.relWords);
-  let root = '';
-  const rels = [];
+  const relWordsText = safeString(raw.relWords)
+  let root = ''
+  const rels = []
 
   if (relWordsText) {
-    const relLines = relWordsText.split('\n').filter(Boolean);
+    const relLines = relWordsText.split('\n').filter(Boolean)
     if (relLines.length > 0) {
-      root = safeString(relLines[0].replace(/^词根:/, ''));
-      let currentPos = '';
-      let currentWords = [];
+      root = safeString(relLines[0].replace(/^词根:/, ''))
+      let currentPos = ''
+      let currentWords = []
 
       for (let i = 1; i < relLines.length; i++) {
-        const line = relLines[i].trim();
-        if (!line) continue;
+        const line = relLines[i].trim()
+        if (!line) continue
 
         if (/^[a-z]+\./i.test(line)) {
           if (currentPos && currentWords.length > 0) {
-            rels.push({pos: currentPos, words: currentWords});
+            rels.push({ pos: currentPos, words: currentWords })
           }
-          currentPos = safeString(line.replace(':', ''));
-          currentWords = [];
+          currentPos = safeString(line.replace(':', ''))
+          currentWords = []
         } else if (line.includes(':')) {
-          const [c, cn] = line.split(':');
-          currentWords.push({c: safeString(c), cn: safeString(cn)});
+          const [c, cn] = line.split(':')
+          currentWords.push({ c: safeString(c), cn: safeString(cn) })
         }
       }
       if (currentPos && currentWords.length > 0) {
-        rels.push({pos: currentPos, words: currentWords});
+        rels.push({ pos: currentPos, words: currentWords })
       }
     }
   }
 
   // 6. etymology
   const etymology = safeSplit(raw.etymology, '\n\n').map(block => {
-    const lines = block.split('\n').map(safeString);
-    const t = lines.shift() || '';
-    const d = lines.join('\n').trim();
-    return {t, d};
-  });
+    const lines = block.split('\n').map(safeString)
+    const t = lines.shift() || ''
+    const d = lines.join('\n').trim()
+    return { t, d }
+  })
 
   return getDefaultWord({
     id: raw.id,
@@ -364,68 +370,68 @@ export function convertToWord(raw: any) {
     sentences,
     phrases,
     synos,
-    relWords: {root, rels},
+    relWords: { root, rels },
     etymology,
-    custom: true
-  });
+    custom: true,
+  })
 }
 
-export function cloneDeep<T>(val: T) {
+export function cloneDeep<T>(val: T): T {
   return JSON.parse(JSON.stringify(val))
 }
 
 export function shuffle<T>(array: T[]): T[] {
-  const result = array.slice(); // 复制数组，避免修改原数组
+  const result = array.slice() // 复制数组，避免修改原数组
   for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1)); // 生成 0 ~ i 的随机索引
-    [result[i], result[j]] = [result[j], result[i]]; // 交换元素
+    const j = Math.floor(Math.random() * (i + 1)) // 生成 0 ~ i 的随机索引
+    ;[result[i], result[j]] = [result[j], result[i]] // 交换元素
   }
-  return result;
+  return result
 }
 
 export function last<T>(array: T[]): T | undefined {
-  return array.length > 0 ? array[array.length - 1] : undefined;
+  return array.length > 0 ? array[array.length - 1] : undefined
 }
 
 export function debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
-  let timer: ReturnType<typeof setTimeout> | null = null;
+  let timer: ReturnType<typeof setTimeout> | null = null
   return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
-    if (timer) clearTimeout(timer);
+    if (timer) clearTimeout(timer)
     timer = setTimeout(() => {
-      func.apply(this, args);
-    }, wait);
-  };
+      func.apply(this, args)
+    }, wait)
+  }
 }
 
 export function throttle<T extends (...args: any[]) => void>(func: T, wait: number) {
-  let lastTime = 0;
+  let lastTime = 0
   return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
-    const now = Date.now();
+    const now = Date.now()
     if (now - lastTime >= wait) {
-      func.apply(this, args);
-      lastTime = now;
+      func.apply(this, args)
+      lastTime = now
     }
-  };
+  }
 }
 
 export function reverse<T>(array: T[]): T[] {
-  return array.slice().reverse();
+  return array.slice().reverse()
 }
 
 export function groupBy<T extends Record<string, any>>(array: T[], key: string) {
   return array.reduce<Record<string, T[]>>((result, item) => {
-    const groupKey = String(item[key]);
-    (result[groupKey] ||= []).push(item);
-    return result;
-  }, {});
+    const groupKey = String(item[key])
+    ;(result[groupKey] ||= []).push(item)
+    return result
+  }, {})
 }
 
 //随机取N个
 export function getRandomN(arr: any[], n: number) {
   const copy = [...arr]
   for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]] // 交换
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copy[i], copy[j]] = [copy[j], copy[i]] // 交换
   }
   return copy.slice(0, n)
 }
@@ -434,8 +440,8 @@ export function getRandomN(arr: any[], n: number) {
 export function splitIntoN(arr: any[], n: number) {
   const result = []
   const len = arr.length
-  const base = Math.floor(len / n)  // 每份至少这么多
-  let extra = len % n               // 前几份多 1 个
+  const base = Math.floor(len / n) // 每份至少这么多
+  let extra = len % n // 前几份多 1 个
 
   let index = 0
   for (let i = 0; i < n; i++) {
@@ -448,43 +454,43 @@ export function splitIntoN(arr: any[], n: number) {
 }
 
 export async function loadJsLib(key: string, url: string) {
-  if (window[key]) return window[key];
+  if (window[key]) return window[key]
   return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
+    const script = document.createElement('script')
     // 判断是否是 .mjs 文件，如果是，则使用 type="module"
-    if (url.endsWith(".mjs")) {
-      script.type = "module";  // 需要加上 type="module"
-      script.src = url;
+    if (url.endsWith('.mjs')) {
+      script.type = 'module' // 需要加上 type="module"
+      script.src = url
       script.onload = async () => {
         try {
           // 使用动态 import 加载模块
-          const module = await import(url); // 动态导入 .mjs 模块
-          window[key] = module.default || module; // 将模块挂到 window 对象
-          resolve(window[key]);
+          const module = await import(url) // 动态导入 .mjs 模块
+          window[key] = module.default || module // 将模块挂到 window 对象
+          resolve(window[key])
         } catch (err) {
-          reject(`${key} 加载失败: ${err.message}`);
+          reject(`${key} 加载失败: ${err.message}`)
         }
-      };
+      }
     } else {
       // 如果是非 .mjs 文件，直接按原方式加载
-      script.src = url;
-      script.onload = () => resolve(window[key]);
+      script.src = url
+      script.onload = () => resolve(window[key])
     }
-    script.onerror = () => reject(key + " 加载失败");
-    document.head.appendChild(script);
-  });
+    script.onerror = () => reject(key + ' 加载失败')
+    document.head.appendChild(script)
+  })
 }
 
 export function total(arr, key) {
   return arr.reduce((a, b) => {
-    a += b[key];
+    a += b[key]
     return a
-  }, 0);
+  }, 0)
 }
 
 export function resourceWrap(resource: string, version?: number) {
   if (AppEnv.IS_OFFICIAL) {
-    if (resource.includes('.json')) resource = resource.replace('.json', '');
+    if (resource.includes('.json')) resource = resource.replace('.json', '')
     if (!resource.includes('http')) resource = RESOURCE_PATH + resource
     if (version === undefined) {
       const store = useBaseStore()
@@ -492,7 +498,7 @@ export function resourceWrap(resource: string, version?: number) {
     }
     return `${resource}_v${version}.json`
   }
-  return resource;
+  return resource
 }
 
 // check if it is a new user
@@ -501,9 +507,11 @@ export async function isNewUser() {
   let base = useBaseStore()
   console.log(JSON.stringify(base.$state))
   console.log(JSON.stringify(getDefaultBaseState()))
-  return JSON.stringify(base.$state) === JSON.stringify({...getDefaultBaseState(), ...{load: true}})
+  return (
+    JSON.stringify(base.$state) === JSON.stringify({ ...getDefaultBaseState(), ...{ load: true } })
+  )
 }
 
 export function jump2Feedback() {
-  window.open('https://v.wjx.cn/vm/ev0W7fv.aspx#', '_blank');
+  window.open('https://v.wjx.cn/vm/ev0W7fv.aspx#', '_blank')
 }

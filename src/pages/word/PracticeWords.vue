@@ -703,7 +703,7 @@ async function continueStudy() {
 }
 
 async function jumpToGroup(group: number) {
-  console.log('没学完，强行跳过',group)
+  console.log('没学完，强行跳过', group)
   store.sdict.lastLearnIndex = (group - 1) * store.sdict.perDayStudyNumber
   emitter.emit(EventKey.resetWord)
   initData(getCurrentStudyWord())
@@ -794,14 +794,11 @@ useEvents([
           <div class="center gap-1">
             <span>{{ store.sdict.name }}</span>
 
-            <GroupList
-              @click="jumpToGroup"
-              v-if="settingStore.wordPracticeMode !== WordPracticeMode.Shuffle"
-            />
-
             <template v-if="taskWords.new.length">
-
-
+              <GroupList
+                @click="jumpToGroup"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.Shuffle"
+              />
               <BaseIcon
                 @click="continueStudy"
                 :title="`下一组(${settingStore.shortcutKeyMap[ShortcutKey.NextChapter]})`"

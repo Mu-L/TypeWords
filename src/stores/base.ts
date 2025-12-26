@@ -221,6 +221,7 @@ export const useBaseStore = defineStore('base', {
         this.word.bookList[this.word.studyIndex].perDayStudyNumber = val.perDayStudyNumber
         this.word.bookList[this.word.studyIndex].lastLearnIndex = val.lastLearnIndex
         this.word.bookList[this.word.studyIndex].userDictId = val.userDictId
+        this.word.bookList[this.word.studyIndex].complete = val.complete
       } else {
         this.word.bookList.push(getDefaultDict(val))
         this.word.studyIndex = this.word.bookList.length - 1

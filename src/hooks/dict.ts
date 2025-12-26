@@ -1,8 +1,8 @@
-import { Article, TaskWords, Word, WordPracticeMode } from "@/types/types.ts";
-import { useBaseStore } from "@/stores/base.ts";
-import { useSettingStore } from "@/stores/setting.ts";
-import { getDefaultWord } from "@/types/func.ts";
-import { getRandomN, splitIntoN } from "@/utils";
+import { Article, TaskWords, Word, WordPracticeMode } from '@/types/types.ts'
+import { useBaseStore } from '@/stores/base.ts'
+import { useSettingStore } from '@/stores/setting.ts'
+import { getDefaultWord } from '@/types/func.ts'
+import { cloneDeep, getRandomN, shuffle, splitIntoN } from '@/utils'
 
 export function useWordOptions() {
   const store = useBaseStore()
@@ -12,7 +12,9 @@ export function useWordOptions() {
   }
 
   function toggleWordCollect(val: Word) {
-    let rIndex = store.collectWord.words.findIndex(v => v.word.toLowerCase() === val.word.toLowerCase())
+    let rIndex = store.collectWord.words.findIndex(
+      v => v.word.toLowerCase() === val.word.toLowerCase()
+    )
     if (rIndex > -1) {
       store.collectWord.words.splice(rIndex, 1)
     } else {
@@ -57,7 +59,7 @@ export function useWordOptions() {
     isWordSimple,
     toggleWordSimple,
     delWrongWord,
-    delSimpleWord
+    delSimpleWord,
   }
 }
 
@@ -88,7 +90,7 @@ export function useArticleOptions() {
 export function getCurrentStudyWord(): TaskWords {
   const store = useBaseStore()
   let data = { new: [], review: [], write: [], shuffle: [] }
-  let dict = store.sdict;
+  let dict = store.sdict
   let isTest = false
   let words = dict.words.slice()
   if (isTest) {
@@ -100,47 +102,62 @@ export function getCurrentStudyWord(): TaskWords {
     const settingStore = useSettingStore()
     //忽略时是否加上自定义的简单词
     let ignoreList = [store.allIgnoreWords, store.knownWords][settingStore.ignoreSimpleWord ? 0 : 1]
-    const perDay = dict.perDayStudyNumber;
-    let start = dict.lastLearnIndex;
-    let complete = dict.complete;
+    const perDay = dict.perDayStudyNumber
+    let start = dict.lastLearnIndex
+    let complete = dict.complete
+    let isEnd = start >= dict.length - 1
     if (isTest) {
       start = 1
       complete = true
     }
+    //如果已完成，并且记录在最后，那么直接随机取复习词
+    if (complete && isEnd) {
+      //复习比最小是1
+      let ratio = settingStore.wordReviewRatio || 1
+      let ignoreList = [store.allIgnoreWords, store.knownWords][
+        settingStore.ignoreSimpleWord ? 0 : 1
+      ]
+      // 先将可用词表全部随机，再按需过滤忽略列表，只取到目标数量为止
+      let shuffled = shuffle(cloneDeep(dict.words))
+      let count = 0
+      data.write = []
+      for (let item of shuffled) {
+        if (!ignoreList.includes(item.word.toLowerCase())) {
+          data.write.push(item)
+          count++
+          if (count >= perDay * ratio) {
+            break
+          }
+        }
+      }
+      return data
+    }
+
     let end = start
     let list = dict.words.slice(start)
-    if (complete) {
-      //如果是已完成，那么把应该学的新词放到复习词组里面
+    //从start往后取perDay个单词，作为当前练习单词
+    for (let item of list) {
+      if (!ignoreList.includes(item.word.toLowerCase())) {
+        if (data.new.length < perDay) {
+          data.new.push(item)
+        } else break
+      }
+      end++
+    }
+
+    //如果复习比大于等于1，或者已完成，那么就取复习词
+    if (settingStore.wordReviewRatio >= 1 || complete) {
+      //从start往前取perDay个单词，作为当前复习单词，取到0为止
+      list = dict.words.slice(0, start).reverse()
+      //但如果已完成，则滚动取值
+      if (complete) list = list.concat(dict.words.slice(end).reverse())
       for (let item of list) {
         if (!ignoreList.includes(item.word.toLowerCase())) {
           if (data.review.length < perDay) {
             data.review.push(item)
           } else break
         }
-        end++
-      }
-    } else {
-      //从start往后取perDay个单词，作为当前练习单词
-      for (let item of list) {
-        if (!ignoreList.includes(item.word.toLowerCase())) {
-          if (data.new.length < perDay) {
-            data.new.push(item)
-          } else break
-        }
-        end++
-      }
-
-      if (settingStore.wordReviewRatio >= 1) {
-        //从start往前取perDay个单词，作为当前复习单词，取到0为止
-        list = dict.words.slice(0, start).reverse()
-        for (let item of list) {
-          if (!ignoreList.includes(item.word.toLowerCase())) {
-            if (data.review.length < perDay) {
-              data.review.push(item)
-            } else break
-          }
-          start--
-        }
+        start--
       }
     }
 
@@ -157,10 +174,10 @@ export function getCurrentStudyWord(): TaskWords {
       let candidateWords = dict.words.slice(0, start).reverse()
       //但如果已完成，则滚动取值
       if (complete) candidateWords = candidateWords.concat(dict.words.slice(end).reverse())
-      candidateWords = candidateWords.filter(w => !ignoreList.includes(w.word.toLowerCase()));
+      candidateWords = candidateWords.filter(w => !ignoreList.includes(w.word.toLowerCase()))
       // console.log(candidateWords.map(v => v.word))
       //最终要获取的单词数量
-      const totalNeed = perDay * (settingStore.wordReviewRatio - 1);
+      const totalNeed = perDay * (settingStore.wordReviewRatio - 1)
       if (candidateWords.length <= totalNeed) {
         data.write = candidateWords
       } else {
@@ -171,19 +188,26 @@ export function getCurrentStudyWord(): TaskWords {
         // console.log('groups', groups)
 
         // 分配数量，靠前组多，靠后组少，例如分配比例 [6,5,4,3,2,1]
-        const ratio = Array.from({ length: days }, (_, i) => i + 1).reverse();
-        const ratioSum = ratio.reduce((a, b) => a + b, 0);
-        const realRatio = ratio.map(r => Math.round(r / ratioSum * totalNeed));
+        const ratio = Array.from({ length: days }, (_, i) => i + 1).reverse()
+        const ratioSum = ratio.reduce((a, b) => a + b, 0)
+        const realRatio = ratio.map(r => Math.round((r / ratioSum) * totalNeed))
         // console.log(ratio, ratioSum, realRatio, realRatio.reduce((a, b) => a + b, 0))
 
         // 按比例从每组随机取单词
-        let writeWords: Word[] = [];
+        let writeWords: Word[] = []
         groups.map((v, i) => {
           writeWords = writeWords.concat(getRandomN(v, realRatio[i]))
         })
         // console.log('writeWords', writeWords)
-        data.write = writeWords;
+        data.write = writeWords
       }
+    }
+
+    //如果已完成，那么合并写词和复习词
+    if(complete){
+      // data.new = []
+      // data.review = data.review.concat(data.write)
+      // data.write = []
     }
   }
   // console.log('data-new', data.new.map(v => v.word))

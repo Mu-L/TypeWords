@@ -73,23 +73,12 @@ watch(model, async newVal => {
       complete: store.sdict.complete,
       str: `name:${store.sdict.name},per:${store.sdict.perDayStudyNumber},spend:${Number(statStore.spend / 1000 / 60).toFixed(1)},index:${store.sdict.lastLearnIndex}`,
     })
-    debugger
 
     //如果 shuffle 数组不为空，就说明是复习，不用修改 lastLearnIndex
+    //todo 
     if (settingStore.wordPracticeMode !== WordPracticeMode.Shuffle) {
-      store.sdict.lastLearnIndex = store.sdict.lastLearnIndex + statStore.newWordNumber
-      //todo 这里计算不正确,因为有可能有单词被忽略,所以需要计算忽略的单词数
-      // 检查已忽略的单词数量，是否全部完成
-
-      let ignoreList = [store.allIgnoreWords, store.knownWords][
-        settingStore.ignoreSimpleWord ? 0 : 1
-      ]
-      // 忽略单词数
-      const ignoreCount = ignoreList.filter(word =>
-        store.sdict.words.some(w => w.word.toLowerCase() === word)
-      ).length
-      // 如果lastLearnIndex已经超过可学单词数，则判定完成
-      if (store.sdict.lastLearnIndex + ignoreCount >= store.sdict.length) {
+      store.sdict.lastLearnIndex = store.sdict.lastLearnIndex + store.sdict.perDayStudyNumber
+      if (store.sdict.lastLearnIndex >= store.sdict.length - 1) {
         dictIsEnd = true
         store.sdict.complete = true
         store.sdict.lastLearnIndex = store.sdict.length
@@ -178,30 +167,25 @@ calcWeekList() // 新增：计算本周学习记录
         <p class="font-medium text-lg">{{ encouragementText }}</p>
       </div>
 
-      <!-- Main Stats Grid -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <!-- Study Time -->
         <div class="item">
           <IconFluentClock20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">学习时长</div>
           <div class="text-xl font-bold">{{ formattedStudyTime }}</div>
         </div>
 
-        <!-- Accuracy Rate -->
         <div class="item">
           <IconFluentTarget20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">正确率</div>
           <div class="text-xl font-bold">{{ accuracyRate }}%</div>
         </div>
 
-        <!-- New Words -->
         <div class="item">
           <IconFluentSparkle20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">新词</div>
           <div class="text-xl font-bold">{{ statStore.newWordNumber }}</div>
         </div>
 
-        <!-- New Words -->
         <div class="item">
           <IconFluentBook20Regular class="text-purple-500" />
           <div class="text-sm mb-1 font-medium">复习</div>
