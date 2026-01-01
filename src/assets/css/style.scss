@@ -292,7 +292,6 @@ a {
 
   &:hover {
     @extend .active;
-    background: var(--color-fourth);
 
     svg {
       opacity: 1;

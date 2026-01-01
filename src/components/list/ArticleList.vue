@@ -8,16 +8,17 @@ import BaseIcon from '@/components/BaseIcon.vue'
 interface IProps {
   list: Article[]
   showTranslate?: boolean
+  showDesc?: boolean
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   list: () => [] as Article[],
   showTranslate: true,
+  showDesc: false,
 })
 
 const emit = defineEmits<{
   click: [val: { item: Article; index: number }]
-  title: [val: { item: Article; index: number }]
 }>()
 
 let searchKey = $ref('')
@@ -88,7 +89,7 @@ defineExpose({ scrollToBottom, scrollToItem })
               <div class="item-title">
                 <div class="name">
                   <span class="text-sm text-gray-500" v-if="index != undefined && !searchKey">
-                    {{ index }}.
+                    {{ item.id == -1 ? '' : (index - (props.showDesc ? 1 : 0)) + '.' }}
                   </span>
                   {{ item.title }}
                 </div>

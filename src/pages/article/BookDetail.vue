@@ -32,7 +32,7 @@ let isAdd = $ref(false)
 let loading = $ref(false)
 let studyLoading = $ref(false)
 
-let selectArticle: Article = $ref(getDefaultArticle())
+let selectArticle: Article = $ref(getDefaultArticle({ id: -1 }))
 
 // 计算当前选中文章的索引
 const currentArticleIndex = computed(() => {
@@ -101,9 +101,6 @@ async function init() {
           }
         }
       }
-      if (runtimeStore.editDict.articles.length) {
-        selectArticle = runtimeStore.editDict.articles[0]
-      }
       loading = false
     }
   }
@@ -168,11 +165,20 @@ function next() {
     selectArticle = runtimeStore.editDict.articles[index + 1]
   }
 }
+
+const list = $computed(() => {
+  return [
+    getDefaultArticle({
+      title: '介绍',
+      id: -1,
+    }),
+  ].concat(runtimeStore.editDict.articles)
+})
 </script>
 
 <template>
-  <BasePage>
-    <div class="card mb-0 dict-detail-card flex flex-col" v-if="showBookDetail">
+  <div class="bg-second h-screen overflow-hidden">
+    <div class="mb-0 flex h-full p-space box-border flex-col" v-if="showBookDetail">
       <div class="dict-header flex justify-between items-center relative">
         <BackIcon class="dict-back z-2" />
         <div class="dict-title absolute text-2xl text-align-center w-full">{{ runtimeStore.editDict.name }}</div>
@@ -185,58 +191,77 @@ function next() {
           <BaseButton :loading="studyLoading || loading" @click="addMyStudyList">学习</BaseButton>
         </div>
       </div>
-      <div class="flex gap-4 mt-2">
-        <img :src="runtimeStore.editDict?.cover" class="w-30 rounded-md" v-if="runtimeStore.editDict?.cover" alt="" />
-        <div class="text-lg">介绍：{{ runtimeStore.editDict.description }}</div>
-      </div>
-      <div class="text-base" v-if="totalSpend">总学习时长：{{ totalSpend }}</div>
 
-      <div class="line my-3"></div>
-
-      <div class="flex flex-1 overflow-hidden">
-        <div class="left flex-[2] scroll p-0">
+      <div class="flex flex-1 overflow-hidden mt-3">
+        <div class="w-70 overflow-auto">
           <ArticleList
+            :show-desc="true"
             v-if="runtimeStore.editDict.length"
-            @title="handleCheckedChange"
             @click="handleCheckedChange"
-            :list="runtimeStore.editDict.articles"
+            :list="list"
             :active-id="selectArticle.id"
           >
           </ArticleList>
           <Empty v-else />
         </div>
-        <div class="right flex-[4] shrink-0 pl-4 overflow-auto">
+        <div class="flex-1 shrink-0 pl-4 overflow-auto">
           <div v-if="selectArticle.id">
-            <div class="font-family text-base mb-4 pr-2" v-if="currentPractice.length">
-              <div class="text-2xl font-bold">学习记录</div>
-              <div class="mt-1 mb-3">总学习时长：{{ msToHourMinute(total(currentPractice, 'spend')) }}</div>
-              <div
-                class="item border border-item border-solid mt-2 p-2 bg-[var(--bg-history)] rounded-md flex justify-between"
-                v-for="i in currentPractice"
-              >
-                <span class="color-gray">{{ _dateFormat(i.startDate) }}</span>
-                <span>{{ msToHourMinute(i.spend) }}</span>
+            <template v-if="selectArticle.id === -1">
+              <div class="flex gap-4 mt-2">
+                <img
+                  :src="runtimeStore.editDict?.cover"
+                  class="w-30 rounded-md"
+                  v-if="runtimeStore.editDict?.cover"
+                  alt=""
+                />
+                <div class="text-lg">介绍：{{ runtimeStore.editDict.description }}</div>
               </div>
-            </div>
-            <div class="text-xl en-article-family">
-              <div class="text-center text-2xl mb-6">
-                <ArticleAudio :article="selectArticle" :autoplay="settingStore.articleAutoPlayNext" @ended="next" />
+              <div class="text-base" v-if="totalSpend">总学习时长：{{ totalSpend }}</div>
+
+              <div class="line my-3"></div>
+            </template>
+            <template v-else>
+              <div class="font-family text-base mb-4 pr-2" v-if="currentPractice.length">
+                <div class="text-2xl font-bold">学习记录</div>
+                <div class="mt-1 mb-3">总学习时长：{{ msToHourMinute(total(currentPractice, 'spend')) }}</div>
+                <div
+                  class="item border border-item border-solid mt-2 p-2 bg-[var(--bg-history)] rounded-md flex justify-between"
+                  v-for="i in currentPractice"
+                >
+                  <span class="color-gray">{{ _dateFormat(i.startDate) }}</span>
+                  <span>{{ msToHourMinute(i.spend) }}</span>
+                </div>
               </div>
-              <div class="text-center text-4xl">{{ selectArticle.title }}</div>
-              <div class="text-2xl" v-if="selectArticle.text">
-                <div class="mt-5 mb-10">Question:{{ selectArticle?.question?.text }}</div>
-                <div class="my-5" v-for="t in selectArticle.text.split('\n\n')">{{ t }}</div>
-                <div class="text-right italic mb-5">{{ selectArticle?.quote?.text }}</div>
+              <div class="en-article-family">
+                <div class="text-3xl">
+                  <span class="">{{ selectArticle.title }}</span>
+                  <span class="ml-6 text-2xl">{{ selectArticle.titleTranslate }}</span>
+                </div>
+                <div class="mb-10 mt-6 text-2xl" v-if="selectArticle?.question?.text">
+                  <div class="flex justify-between items-center">
+                    <span class="">First Listen and then answer the following question.</span>
+                    <ArticleAudio
+                      class="w-100!"
+                      :article="selectArticle"
+                      :autoplay="settingStore.articleAutoPlayNext"
+                      @ended="next"
+                    />
+                  </div>
+                  <div class="decoration-dashed underline">{{ selectArticle?.question?.text }}</div>
+                </div>
+                <div class="text-2xl line-height-normal" v-if="selectArticle.text">
+                  <div class="my-5" v-for="t in selectArticle.text.split('\n\n')">{{ t }}</div>
+                  <div class="text-right italic mb-5">{{ selectArticle?.quote?.text }}</div>
+                </div>
               </div>
-            </div>
-            <div class="mt-2">
-              <div class="text-center text-2xl">{{ selectArticle.titleTranslate }}</div>
-              <div class="text-xl" v-if="selectArticle.textTranslate">
-                <div class="my-5" v-for="t in selectArticle.textTranslate.split('\n\n')">{{ t }}</div>
-                <div class="text-right italic mb-5">{{ selectArticle?.quote?.translate }}</div>
+              <div class="mt-13">
+                <div class="text-xl line-height-normal" v-if="selectArticle.textTranslate">
+                  <div class="my-5" v-for="t in selectArticle.textTranslate.split('\n\n')">{{ t }}</div>
+                  <div class="text-right italic mb-5">{{ selectArticle?.quote?.translate }}</div>
+                </div>
+                <Empty v-else />
               </div>
-              <Empty v-else />
-            </div>
+            </template>
           </div>
           <Empty v-else />
         </div>
@@ -254,7 +279,7 @@ function next() {
         <EditBook :is-add="isAdd" :is-book="true" @close="formClose" @submit="isEdit = isAdd = false" />
       </div>
     </div>
-  </BasePage>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -316,3 +341,4 @@ function next() {
   }
 }
 </style>
+```````` ;
