@@ -19,7 +19,7 @@ import vip from "@/pages/(user)/vip.vue";
 import feedback from "@/pages/feedback.vue";
 import qa from "@/pages/qa.vue";
 import doc from "@/pages/doc.vue";
-// import { useAuthStore } from "@/stores/user.ts";
+// import { useAuthStore } from "@/stores/user";
 
 export const routes: RouteRecordRaw[] = [
   {

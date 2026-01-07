@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSettingStore } from '@/stores/setting.ts'
+import { useSettingStore } from '@/stores/setting'
 
 const settingStore = useSettingStore()
 defineProps<{

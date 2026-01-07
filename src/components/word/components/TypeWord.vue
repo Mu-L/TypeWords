@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import type { Word } from '@/types/types.ts'
+import type { Word } from '@/types/types'
 import VolumeIcon from '@/components/icon/VolumeIcon.vue'
-import { useSettingStore } from '@/stores/setting.ts'
-import { usePlayBeep, usePlayCorrect, usePlayKeyboardAudio, usePlayWordAudio } from '@/hooks/sound.ts'
-import { emitter, EventKey, useEvents } from '@/utils/eventBus.ts'
+import { useSettingStore } from '@/stores/setting'
+import { usePlayBeep, usePlayCorrect, usePlayKeyboardAudio, usePlayWordAudio } from '@/hooks/sound'
+import { emitter, EventKey, useEvents } from '@/utils/eventBus'
 import { onMounted, onUnmounted, watch } from 'vue'
 import SentenceHightLightWord from '@/components/word/components/SentenceHightLightWord.vue'
-import { usePracticeStore } from '@/stores/practice.ts'
-import { getDefaultWord } from '@/types/func.ts'
+import { usePracticeStore } from '@/stores/practice'
+import { getDefaultWord } from '@/types/func'
 import { _nextTick, last } from '@/utils'
 import BaseButton from '@/components/BaseButton.vue'
 import Space from '@/components/article/components/Space.vue'
-import Toast from '@/components/base/toast/Toast.ts'
+import Toast from '@/components/base/toast/Toast'
 import Tooltip from '@/components/base/Tooltip.vue'
-import { ShortcutKey, WordPracticeStage, WordPracticeType } from '@/types/enum.ts'
+import { ShortcutKey, WordPracticeStage, WordPracticeType } from '@/types/enum'
 
 interface IProps {
   word: Word

@@ -1,14 +1,14 @@
-import type { Article, Sentence } from "@/types/types.ts"
+import type { Article, Sentence } from "@/types/types"
 import { _nextTick, cloneDeep } from "@/utils"
-import { usePlayWordAudio } from "@/hooks/sound.ts"
-import { getSentenceAllText, getSentenceAllTranslateText } from "@/hooks/translate.ts"
-import { getDefaultArticleWord, getDefaultDict } from "@/types/func.ts"
-import { useSettingStore } from "@/stores/setting.ts"
-import { useBaseStore } from "@/stores/base.ts"
-import { useRuntimeStore } from "@/stores/runtime.ts"
+import { usePlayWordAudio } from "@/hooks/sound"
+import { getSentenceAllText, getSentenceAllTranslateText } from "@/hooks/translate"
+import { getDefaultArticleWord, getDefaultDict } from "@/types/func"
+import { useSettingStore } from "@/stores/setting"
+import { useBaseStore } from "@/stores/base"
+import { useRuntimeStore } from "@/stores/runtime"
 import { nanoid } from 'nanoid'
-import {PracticeArticleWordType} from "@/types/enum.ts";
-import { DictId } from '@/config/env.ts'
+import {PracticeArticleWordType} from "@/types/enum";
+import { DictId } from '@/config/env'
 
 function parseSentence(sentence: string) {
   // 先统一一些常见的“智能引号” -> 直引号，避免匹配问题

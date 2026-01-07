@@ -1,4 +1,4 @@
-import { DictType, PracticeArticleWordType } from '@/types/enum.ts'
+import { DictType, PracticeArticleWordType } from '@/types/enum'
 
 export type Word = {
   id?: string

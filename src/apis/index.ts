@@ -1,4 +1,4 @@
-import http, {axiosInstance, AxiosResponse} from "@/utils/http.ts";
+import http, {axiosInstance, AxiosResponse} from "@/utils/http";
 import type { Dict } from "@/types/types.ts";
 import { cloneDeep } from "@/utils";
 
