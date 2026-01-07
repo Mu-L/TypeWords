@@ -355,7 +355,7 @@ const systemPracticeText = $computed(() => {
               {{ isSaveData ? '上次任务' : '今日任务' }}
             </div>
             <span class="color-link cursor-pointer" v-if="store.sdict.id" @click="showPracticeWordListDialog = true"
-              >词表</span
+            >词表</span
             >
           </div>
           <div class="flex gap-1 items-center" v-if="store.sdict.id">

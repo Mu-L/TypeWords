@@ -1,22 +1,24 @@
 import * as VueRouter from 'vue-router'
 import {RouteRecordRaw} from 'vue-router'
-import WordsPage from "@/pages/word/WordsPage.vue";
 import Layout from "@/pages/layout.vue";
-import ArticlesPage from "@/pages/article/ArticlesPage.vue";
-import PracticeArticles from "@/pages/article/PracticeArticles.vue";
-import DictDetail from "@/pages/word/DictDetail.vue";
-import PracticeWords from "@/pages/word/PracticeWords.vue";
-import WordTest from "@/pages/word/WordTest.vue";
-import BookDetail from "@/pages/article/BookDetail.vue";
-import DictList from "@/pages/word/DictList.vue";
-import BookList from "@/pages/article/BookList.vue";
-import Setting from "@/pages/setting/Setting.vue";
-import Login from "@/pages/user/login.vue";
-import User from "@/pages/user/User.vue";
-import VipIntro from "@/pages/user/VipIntro.vue";
-import Feedback from "@/pages/feedback.vue";
-import Qa from "@/pages/qa.vue";
-import Doc from "@/pages/doc.vue";
+import words from "@/pages/(words)/words.vue";
+import DictDetail from "@/pages/(words)/dict-detail.vue";
+import DictList from "@/pages/(words)/dict-list.vue";
+import PracticeWords from "@/pages/(words)/practice-words/[id].vue";
+import WordTest from "@/pages/(words)/words-test/[id].vue";
+
+import articles from "@/pages/(articles)/articles.vue";
+import BookDetail from "@/pages/(articles)/book-detail.vue";
+import BookList from "@/pages/(articles)/book-list.vue";
+import PracticeArticles from "@/pages/(articles)/practice-articles/[id].vue";
+
+import setting from "@/pages/setting/Setting.vue";
+import login from "@/pages/(user)/login.vue";
+import user from "@/pages/(user)/user.vue";
+import vip from "@/pages/(user)/vip.vue";
+import feedback from "@/pages/feedback.vue";
+import qa from "@/pages/qa.vue";
+import doc from "@/pages/doc.vue";
 // import { useAuthStore } from "@/stores/user.ts";
 
 export const routes: RouteRecordRaw[] = [
@@ -25,7 +27,7 @@ export const routes: RouteRecordRaw[] = [
     component: Layout,
     children: [
       {path: '/', redirect: '/words'},
-      {path: 'words', component: WordsPage},
+      {path: 'words', component: words},
       {path: 'word', redirect: '/words'},
       {path: 'practice-words/:id', component: PracticeWords},
       {path: 'word-test/:id', component: WordTest},
@@ -33,24 +35,24 @@ export const routes: RouteRecordRaw[] = [
       {path: 'dict-list', component: DictList},
       {path: 'dict-detail', component: DictDetail},
 
-      {path: 'articles', component: ArticlesPage},
+      {path: 'articles', component: articles},
       {path: 'article', redirect: '/articles'},
       {path: 'practice-articles/:id', component: PracticeArticles},
       {path: 'study-article', redirect: '/articles'},
       {path: 'book-detail', component: BookDetail},
       {path: 'book-list', component: BookList},
 
-      {path: 'login', component: Login},
-      {path: 'user', component: User},
-      {path: 'vip', component: VipIntro},
+      {path: 'login', component: login},
+      {path: 'user', component: user},
+      {path: 'vip', component: vip},
 
-      {path: 'setting', component: Setting},
-      {path: 'feedback', component: Feedback},
-      {path: 'qa', component: Qa},
-      {path: 'doc', component: Doc},
+      {path: 'setting', component: setting},
+      {path: 'feedback', component: feedback},
+      {path: 'qa', component: qa},
+      {path: 'doc', component: doc},
     ]
   },
-  {path: '/batch-edit-article', component: () => import("@/pages/article/BatchEditArticlePage.vue")},
+  {path: '/batch-edit-article', component: () => import("@/pages/(articles)/batch-edit-article.vue")},
   {path: '/test', component: () => import("@/pages/test/test.vue")},
   {path: '/:pathMatch(.*)*', redirect: '/words'},
 ]

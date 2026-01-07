@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import BasePage from '@/components/BasePage.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import {useRouter} from 'vue-router'
-import {useUserStore} from '@/stores/user.ts'
-import {User} from "@/apis/user.ts";
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
-import Header from "@/components/Header.vue";
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user.ts'
+import { User } from '@/apis/user.ts'
+import { onMounted, onUnmounted, watch } from 'vue'
+import Header from '@/components/Header.vue'
 import {
   alipayQuery,
   CouponInfo,
@@ -14,17 +14,15 @@ import {
   levelBenefits,
   orderCreate,
   orderStatus,
-  setAutoRenewApi, testPay
-} from "@/apis/member.ts";
-import Radio from "@/components/base/radio/Radio.vue";
-import RadioGroup from "@/components/base/radio/RadioGroup.vue";
-import {APP_NAME} from "@/config/env.ts";
-import Toast from "@/components/base/toast/Toast.ts";
-import {_dateFormat, _nextTick} from "@/utils";
-import InputNumber from "@/components/base/InputNumber.vue";
-import dayjs from "dayjs";
-import BaseInput from "@/components/base/BaseInput.vue";
-import PopConfirm from "@/components/PopConfirm.vue";
+  setAutoRenewApi,
+} from '@/apis/member.ts'
+import Radio from '@/components/base/radio/Radio.vue'
+import RadioGroup from '@/components/base/radio/RadioGroup.vue'
+import Toast from '@/components/base/toast/Toast.ts'
+import { _dateFormat, _nextTick } from '@/utils'
+import InputNumber from '@/components/base/InputNumber.vue'
+import BaseInput from '@/components/base/BaseInput.vue'
+import PopConfirm from '@/components/PopConfirm.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -38,11 +36,11 @@ interface Plan {
   autoRenew?: boolean
 }
 
-let loading = $ref(false);
+let loading = $ref(false)
 let selectedPaymentMethod = $ref('alipay')
 let selectedPlanId = $ref('')
 let duration = $ref(1)
-const member = $computed<User['member']>(() => userStore.user?.member ?? {} as any)
+const member = $computed<User['member']>(() => userStore.user?.member ?? ({} as any))
 
 const memberEndDate = $computed(() => {
   if (member?.endDate === null) return '永久'
@@ -58,7 +56,7 @@ const plans: Plan[] = $computed(() => {
       name: '月付',
       price: data.level.price,
       unit: '月',
-    },)
+    })
     list.push({
       id: 'month_auto',
       name: '连续包月',
@@ -66,14 +64,14 @@ const plans: Plan[] = $computed(() => {
       unit: '月',
       highlight: '性价比更高',
       autoRenew: true,
-    },)
+    })
     list.push({
       id: 'year',
       name: '年度会员',
       price: data.level.yearly_price,
       unit: '年',
       highlight: '年度优惠',
-    },)
+    })
   }
   return list
 })
@@ -88,8 +86,8 @@ const paymentMethods = [
   {
     id: 'alipay',
     name: '支付宝',
-    description: '使用支付宝支付'
-  }
+    description: '使用支付宝支付',
+  },
 ]
 
 const currentPlan = $computed(() => {
@@ -118,36 +116,35 @@ const enoughDiscount = $computed(() => {
 })
 
 const endPrice = $computed(() => {
-    if (!coupon.is_valid) {
-      return Number(originalPrice.toFixed(2))
-    }
-
-    if (coupon.type === 'free_trial') return 0
-
-    if (!enoughDiscount) {
-      return Number(originalPrice.toFixed(2))
-    }
-
-    let discountAmount = 0
-    if (coupon.type === 'discount') {
-      // Discount coupon: e.g., 0.8 means 20% off
-      const discountRate = Number(coupon.value)
-      discountAmount = originalPrice * (1 - discountRate)
-
-      // Apply max_discount limit if available
-      if (coupon.max_discount) {
-        const maxDiscount = Number(coupon.max_discount)
-        discountAmount = Math.min(discountAmount, maxDiscount)
-      }
-    } else if (coupon.type === 'amount') {
-      // Amount coupon: fixed amount off
-      discountAmount = Number(coupon.value)
-    }
-
-    const finalPrice = Math.max(originalPrice - discountAmount, 0)
-    return finalPrice.toFixed(2)
+  if (!coupon.is_valid) {
+    return Number(originalPrice.toFixed(2))
   }
-)
+
+  if (coupon.type === 'free_trial') return 0
+
+  if (!enoughDiscount) {
+    return Number(originalPrice.toFixed(2))
+  }
+
+  let discountAmount = 0
+  if (coupon.type === 'discount') {
+    // Discount coupon: e.g., 0.8 means 20% off
+    const discountRate = Number(coupon.value)
+    discountAmount = originalPrice * (1 - discountRate)
+
+    // Apply max_discount limit if available
+    if (coupon.max_discount) {
+      const maxDiscount = Number(coupon.max_discount)
+      discountAmount = Math.min(discountAmount, maxDiscount)
+    }
+  } else if (coupon.type === 'amount') {
+    // Amount coupon: fixed amount off
+    discountAmount = Number(coupon.value)
+  }
+
+  const finalPrice = Math.max(originalPrice - discountAmount, 0)
+  return finalPrice.toFixed(2)
+})
 
 const startDate = $computed(() => {
   if (member?.active) {
@@ -158,18 +155,18 @@ const startDate = $computed(() => {
 })
 
 onMounted(async () => {
-  let res = await levelBenefits({levelCode: 'basic'})
+  let res = await levelBenefits({ levelCode: 'basic' })
   if (res.success) {
     data = res.data
   }
 })
 
-let loading2 = $ref(false);
+let loading2 = $ref(false)
 
 async function toggleAutoRenew() {
   if (loading2) return
   loading2 = true
-  let res = await setAutoRenewApi({autoRenew: false})
+  let res = await setAutoRenewApi({ autoRenew: false })
   if (res.success) {
     Toast.success('取消成功')
     userStore.init()
@@ -188,13 +185,13 @@ function getPlanButtonText(plan: Plan) {
 
 function goPurchase(plan: Plan) {
   if (!userStore.isLogin) {
-    router.push({path: '/login', query: {redirect: '/vip'}})
+    router.push({ path: '/login', query: { redirect: '/vip' } })
     return
   }
   selectedPlanId = plan.id
   _nextTick(() => {
     let el = document.getElementById('pay')
-    el.scrollIntoView({behavior: "smooth"})
+    el.scrollIntoView({ behavior: 'smooth' })
   })
 }
 
@@ -202,36 +199,39 @@ let startLoop = $ref(false)
 let orderNo = $ref('')
 let timer: number = $ref()
 let showCouponInput = $ref(false)
-let coupon = $ref<CouponInfo>({code: ''} as CouponInfo)
+let coupon = $ref<CouponInfo>({ code: '' } as CouponInfo)
 let checkLoading = $ref(false)
 let showCheckBtn = $ref(false)
 
-watch(() => startLoop, (n) => {
-  if (n) {
-    clearInterval(timer)
-    timer = setInterval(() => {
-      orderStatus({orderNo}).then(res => {
-        if (res?.success) {
-          if (res.data?.payment_status === 'paid') {
-            Toast.success('付款成功')
-            userStore.init()
+watch(
+  () => startLoop,
+  n => {
+    if (n) {
+      clearInterval(timer)
+      timer = setInterval(() => {
+        orderStatus({ orderNo }).then(res => {
+          if (res?.success) {
+            if (res.data?.payment_status === 'paid') {
+              Toast.success('付款成功')
+              userStore.init()
+              startLoop = false
+              selectedPlanId = undefined
+            }
+          } else {
             startLoop = false
-            selectedPlanId = undefined
+            Toast.error(res.msg || '付款失败')
           }
-        } else {
-          startLoop = false
-          Toast.error(res.msg || '付款失败')
-        }
-      })
-    }, 1000)
-    setTimeout(() => {
-      showCheckBtn = true
-    }, 3000)
-  } else {
-    clearInterval(timer)
-    showCheckBtn = false
+        })
+      }, 1000)
+      setTimeout(() => {
+        showCheckBtn = true
+      }, 3000)
+    } else {
+      clearInterval(timer)
+      showCheckBtn = false
+    }
   }
-})
+)
 
 onUnmounted(() => {
   startLoop = false
@@ -252,21 +252,21 @@ async function handlePayment() {
     plan: selectedPlanId,
     duration: Number(duration),
     payment_method: selectedPaymentMethod,
-    couponCode: coupon.is_valid ? coupon.code : undefined
+    couponCode: coupon.is_valid ? coupon.code : undefined,
   }
   let res = await orderCreate(data)
   console.log('res', res)
   if (res.success) {
     _nextTick(() => {
-      const iframe = document.getElementById('payFrame');
+      const iframe = document.getElementById('payFrame')
       // 强制重置为 about:blank，让 document 可写
-      iframe.src = 'about:blank';
+      iframe.src = 'about:blank'
       iframe.onload = () => {
-        const doc = iframe.contentWindow.document;
-        doc.open();
-        doc.write(res.data.result);   // 写入 form
-        doc.close();           // form 会自动提交
-      };
+        const doc = iframe.contentWindow.document
+        doc.open()
+        doc.write(res.data.result) // 写入 form
+        doc.close() // form 会自动提交
+      }
       startLoop = true
     })
     orderNo = res.data.orderNo
@@ -279,7 +279,7 @@ async function handlePayment() {
 async function checkOrderStatus() {
   if (checkLoading) return
   checkLoading = true
-  let res = await alipayQuery({orderNo})
+  let res = await alipayQuery({ orderNo })
   if (!res.success) {
     Toast.info(res.msg || '未付款')
   }
@@ -298,11 +298,11 @@ async function getCouponInfo() {
       if (res.data.is_valid) {
         coupon = res.data
       } else {
-        coupon = {code: coupon.code} as CouponInfo
+        coupon = { code: coupon.code } as CouponInfo
         Toast.info('优惠券已失效')
       }
     } else {
-      coupon = {code: coupon.code} as CouponInfo
+      coupon = { code: coupon.code } as CouponInfo
       Toast.error(res.msg || '优惠券无效')
     }
     couponLoading = false
@@ -310,7 +310,6 @@ async function getCouponInfo() {
     showCouponInput = true
   }
 }
-
 </script>
 
 <template>
@@ -320,7 +319,7 @@ async function getCouponInfo() {
         <Header title="会员介绍"></Header>
         <div class="grid grid-cols-3 grid-rows-3 gap-3">
           <div class="text-lg flex items-center" v-for="f in data.benefits" :key="f.name">
-            <IconFluentCheckmarkCircle20Regular class="mr-2 text-green-600"/>
+            <IconFluentCheckmarkCircle20Regular class="mr-2 text-green-600" />
             <span>
               <span>{{ f.name }}</span>
               <span v-if="f.value !== 'true'">{{ `(${f.value}${f.unit ?? ''})` }}</span>
@@ -329,27 +328,22 @@ async function getCouponInfo() {
         </div>
       </div>
 
-      <div v-if="member?.active" class="card-white bg-green-50 dark:bg-item border border-green-200  mt-3 mb-6">
+      <div v-if="member?.active" class="card-white bg-green-50 dark:bg-item border border-green-200 mt-3 mb-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center">
-            <IconFluentCheckmarkCircle20Regular class="mr-2 text-green-600"/>
+            <IconFluentCheckmarkCircle20Regular class="mr-2 text-green-600" />
             <div>
               <div class="font-semibold text-green-800">当前计划：{{ currentPlan?.name }}</div>
-              <div class="text-sm text-green-600">
-                到期时间：{{ memberEndDate }}
-              </div>
+              <div class="text-sm text-green-600">到期时间：{{ memberEndDate }}</div>
             </div>
           </div>
           <div class="text-align-end space-y-2">
             <div v-if="member.autoRenew" class="flex items-center gap-space">
               <div class="flex items-center text-sm text-gray-600">
-                <IconFluentArrowRepeatAll20Regular class="mr-1"/>
+                <IconFluentArrowRepeatAll20Regular class="mr-1" />
                 <span>自动续费已开启</span>
               </div>
-              <PopConfirm
-                title="确认取消？"
-                @confirm="toggleAutoRenew"
-              >
+              <PopConfirm title="确认取消？" @confirm="toggleAutoRenew">
                 <BaseButton size="small" type="info" :loading="loading2">关闭</BaseButton>
               </PopConfirm>
             </div>
@@ -363,8 +357,7 @@ async function getCouponInfo() {
       </div>
 
       <div class="plans">
-        <div v-for="p in plans" :key="p.id"
-             class="card-white p-0 overflow-hidden flex flex-col">
+        <div v-for="p in plans" :key="p.id" class="card-white p-0 overflow-hidden flex flex-col">
           <div class="text-2xl font-bold bg-gray-300 dark:bg-third px-6 py-4">{{ p.name }}</div>
           <div class="p-6 flex flex-col justify-between flex-1">
             <div class="plan-head">
@@ -375,12 +368,16 @@ async function getCouponInfo() {
               <div v-if="p.highlight" class="tag">{{ p.highlight }}</div>
             </div>
             <div v-if="p.autoRenew" class="text-sm flex items-center mt-4">
-              <IconFluentArrowRepeatAll20Regular class="mr-2"/>
+              <IconFluentArrowRepeatAll20Regular class="mr-2" />
               开启自动续费，可随时关闭
             </div>
-            <BaseButton class="w-full mt-4" size="large"
-                        :type="(p.id === currentPlan?.id || p.id === selectedPlanId) ? 'primary' : 'info'"
-                        :disabled="p.id === currentPlan?.id" @click="goPurchase(p)">
+            <BaseButton
+              class="w-full mt-4"
+              size="large"
+              :type="p.id === currentPlan?.id || p.id === selectedPlanId ? 'primary' : 'info'"
+              :disabled="p.id === currentPlan?.id"
+              @click="goPurchase(p)"
+            >
               {{ getPlanButtonText(p) }}
             </BaseButton>
           </div>
@@ -397,25 +394,25 @@ async function getCouponInfo() {
 
       <div class="center">
         <div class="card-white w-5/10">
-          <div class="flex items-center justify-between gap-6 ">
+          <div class="flex items-center justify-between gap-6">
             <div class="center gap-2" v-if="!showCouponInput">
-              <IconStreamlineDiscountPercentCoupon/>
+              <IconStreamlineDiscountPercentCoupon />
               <span>有优惠券？</span>
             </div>
-            <BaseInput v-else v-model="coupon.code"
-                       placeholder="请输入优惠券"
-                       autofocus
-                       clearable
-                       @enter="getCouponInfo"
+            <BaseInput
+              v-else
+              v-model="coupon.code"
+              placeholder="请输入优惠券"
+              autofocus
+              clearable
+              @enter="getCouponInfo"
             />
-            <BaseButton size="large"
-                        :loading="couponLoading"
-                        @click="getCouponInfo">{{ showCouponInput ? '确定' : '在此兑换!' }}
+            <BaseButton size="large" :loading="couponLoading" @click="getCouponInfo"
+              >{{ showCouponInput ? '确定' : '在此兑换!' }}
             </BaseButton>
           </div>
 
-          <div class="bg-green-50 border border-green-200 rounded-lg px-4 py-3 mt-4"
-               v-if="coupon.is_valid">
+          <div class="bg-green-50 border border-green-200 rounded-lg px-4 py-3 mt-4" v-if="coupon.is_valid">
             <div class="font-medium">优惠券: {{ coupon.name }}</div>
             <div class="flex justify-between w-full mt-2">
               <span v-if="coupon.type === 'discount'">折扣券：{{ (Number(coupon.value) * 10).toFixed(1) }}折</span>
@@ -426,8 +423,8 @@ async function getCouponInfo() {
               <div v-if="coupon.min_amount || coupon.max_discount">
                 <span v-if="coupon.min_amount">满{{ Number(coupon.min_amount).toFixed(2) }}元可用</span>
                 <span v-if="coupon.max_discount && coupon.type === 'discount'">
-                          · 最高减{{ Number(coupon.max_discount).toFixed(2) }}元
-                        </span>
+                  · 最高减{{ Number(coupon.max_discount).toFixed(2) }}元
+                </span>
               </div>
             </div>
           </div>
@@ -441,13 +438,16 @@ async function getCouponInfo() {
           <div class="text-lg font-medium mb-4">选择支付方式</div>
           <RadioGroup v-model="selectedPaymentMethod">
             <div class="space-y-3 w-full">
-              <div v-for="method in paymentMethods" :key="method.id"
-                   @click=" selectedPaymentMethod = method.id"
-                   class="flex p-4 border rounded-lg cp transition-all duration-200 hover:bg-item"
-                   :class="selectedPaymentMethod === method.id && 'bg-item'">
+              <div
+                v-for="method in paymentMethods"
+                :key="method.id"
+                @click="selectedPaymentMethod = method.id"
+                class="flex p-4 border rounded-lg cp transition-all duration-200 hover:bg-item"
+                :class="selectedPaymentMethod === method.id && 'bg-item'"
+              >
                 <div class="flex items-center flex-1 gap-4">
-                  <IconSimpleIconsWechat class="text-xl color-green-500" v-if="method.id === 'wechat'"/>
-                  <IconUiwAlipay class="text-xl color-blue" v-else/>
+                  <IconSimpleIconsWechat class="text-xl color-green-500" v-if="method.id === 'wechat'" />
+                  <IconUiwAlipay class="text-xl color-blue" v-else />
                   <div>
                     <div class="font-medium color-main">{{ method.name }}</div>
                     <div class="text-sm text-gray-500">{{ method.description }}</div>
@@ -472,14 +472,13 @@ async function getCouponInfo() {
           <div class="flex justify-between items-center mb-4">
             <!-- Price -->
             <div class="flex items-baseline">
-                <span class="font-semibold"
-                      :class="selectPlan?.id === 'month_auto' ? 'text-3xl' : 'text-xl'">
-                  ￥{{ selectPlan?.price }}
-                </span>
+              <span class="font-semibold" :class="selectPlan?.id === 'month_auto' ? 'text-3xl' : 'text-xl'">
+                ￥{{ selectPlan?.price }}
+              </span>
               <span class="ml-2">/ {{ selectPlan?.unit }}</span>
             </div>
             <div v-if="selectPlan?.id !== 'month_auto'">
-              <InputNumber :min="1" v-model="duration"/>
+              <InputNumber :min="1" v-model="duration" />
             </div>
           </div>
 
@@ -490,7 +489,7 @@ async function getCouponInfo() {
             </div>
             <div class="text-sm">
               <div v-if="enoughDiscount" class="text-green-600 flex items-center">
-                <IconStreamlineDiscountPercentCoupon class="mr-2"/>
+                <IconStreamlineDiscountPercentCoupon class="mr-2" />
                 <span>已优惠：￥{{ (Number(originalPrice) - Number(endPrice)).toFixed(2) }}</span>
               </div>
               <span v-else>优惠券不可用：未满足条件</span>
@@ -503,14 +502,19 @@ async function getCouponInfo() {
             <span class="text-3xl font-semibold">￥{{ endPrice }}</span>
           </div>
 
-          <div class="bg-second	 text-sm px-4 py-3 rounded-lg mb-4 text-gray-600">
+          <div class="bg-second text-sm px-4 py-3 rounded-lg mb-4 text-gray-600">
             会员属于虚拟服务，一经购买激活后不支持退款。请在购买前仔细阅读权益说明，确认符合您的需求再进行支付。
           </div>
 
           <!-- Payment Button -->
-          <BaseButton class="w-full" size="large" :loading="loading || startLoop"
-                      :type="!!selectedPaymentMethod ? 'primary' : 'info'" :disabled="!selectedPaymentMethod"
-                      @click="handlePayment">
+          <BaseButton
+            class="w-full"
+            size="large"
+            :loading="loading || startLoop"
+            :type="!!selectedPaymentMethod ? 'primary' : 'info'"
+            :disabled="!selectedPaymentMethod"
+            @click="handlePayment"
+          >
             付款
           </BaseButton>
         </div>
@@ -520,31 +524,22 @@ async function getCouponInfo() {
           <div class="text-lg font-semibold mb-4">扫码支付</div>
           <div class="center flex-col relative flex-1">
             <div class="center h-full w-full absolute left-0 top-0 bg-white z-2" v-if="!startLoop">
-              <div class="w-5/10">
-                请点击左侧付款按钮后，支付二维码将自动显示
-              </div>
+              <div class="w-5/10">请点击左侧付款按钮后，支付二维码将自动显示</div>
             </div>
 
             <iframe id="payFrame" class="w-[205px] h-[205px] center border-none"></iframe>
-            <div class="text-center my-4">
-              请使用支付宝扫码支付
-            </div>
-            <BaseButton size="large"
-                        v-if="showCheckBtn"
-                        :loading="checkLoading"
-                        @click="checkOrderStatus">
+            <div class="text-center my-4">请使用支付宝扫码支付</div>
+            <BaseButton size="large" v-if="showCheckBtn" :loading="checkLoading" @click="checkOrderStatus">
               我已付款
             </BaseButton>
           </div>
         </div>
       </div>
     </div>
-
   </BasePage>
 </template>
 
 <style scoped lang="scss">
-
 .pay-dialog {
   position: fixed;
   left: 0;
@@ -563,7 +558,6 @@ async function getCouponInfo() {
 .plan-head {
   @apply flex flex-col gap-2;
 }
-
 
 .price {
   @apply flex items-end gap-1;

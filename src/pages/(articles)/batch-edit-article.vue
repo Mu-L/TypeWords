@@ -283,7 +283,7 @@ function updateList(e) {
                 :loading="exportLoading"
                 :disabled="!article.id"
                 @click="exportData({ type: 'item', data: article })"
-                >当前
+              >当前
               </BaseButton>
             </div>
           </MiniDialog>
