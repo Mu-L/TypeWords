@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Switch from '@/components/base/Switch.vue'
 import Slider from '@/components/base/Slider.vue'
-import SettingItem from '@/pages/setting/SettingItem.vue'
+import SettingItem from '@/components/setting/SettingItem.vue'
 import { useSettingStore } from '@/stores/setting.ts'
 
 const settingStore = useSettingStore()

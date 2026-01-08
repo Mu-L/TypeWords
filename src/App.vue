@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
-import { BaseState, useBaseStore } from '@/stores/base.ts'
-import { useRuntimeStore } from '@/stores/runtime.ts'
-import { useSettingStore } from '@/stores/setting.ts'
-import useTheme from '@/hooks/theme.ts'
+import { BaseState, useBaseStore } from '@/stores/base'
+import { useRuntimeStore } from '@/stores/runtime'
+import { useSettingStore } from '@/stores/setting'
+import useTheme from '@/hooks/theme'
 import { loadJsLib, shakeCommonDict } from '@/utils'
 import { get, set } from 'idb-keyval'
 
 import { useRoute } from 'vue-router'
-import { APP_VERSION, AppEnv, DictId, LOCAL_FILE_KEY, Origin, SAVE_DICT_KEY, SAVE_SETTING_KEY } from '@/config/env.ts'
+import { APP_VERSION, AppEnv, DictId, LOCAL_FILE_KEY, Origin, SAVE_DICT_KEY, SAVE_SETTING_KEY } from '@/config/env'
 import { syncSetting } from '@/apis'
-import { useUserStore } from '@/stores/user.ts'
+import { useUserStore } from '@/stores/user'
 import MigrateDialog from '@/components/MigrateDialog.vue'
 
 const store = useBaseStore()

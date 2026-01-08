@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {computed, provide} from "vue"
-import {useSettingStore} from "@/stores/setting.ts";
+import {useSettingStore} from "@/stores/setting";
 import Close from "@/components/icon/Close.vue";
 import Tooltip from "@/components/base/Tooltip.vue";
-import {ShortcutKey} from "@/types/enum.ts";
+import {ShortcutKey} from "@/types/enum";
 
 const settingStore = useSettingStore()
 let tabIndex = $ref(0)

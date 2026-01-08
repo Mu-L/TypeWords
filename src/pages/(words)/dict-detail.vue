@@ -15,8 +15,8 @@ import Toast from '@/components/base/toast/Toast.ts'
 import DeleteIcon from '@/components/icon/DeleteIcon.vue'
 import { AppEnv, DictId, LIB_JS_URL, TourConfig } from '@/config/env.ts'
 import { getCurrentStudyWord } from '@/hooks/dict.ts'
-import EditBook from '@/pages/article/components/EditBook.vue'
-import PracticeSettingDialog from '@/pages/word/components/PracticeSettingDialog.vue'
+import EditBook from '@/components/article/components/EditBook.vue'
+import PracticeSettingDialog from '@/components/word/components/PracticeSettingDialog.vue'
 import { useBaseStore } from '@/stores/base.ts'
 import { useRuntimeStore } from '@/stores/runtime.ts'
 import { useSettingStore } from '@/stores/setting.ts'
@@ -183,11 +183,11 @@ function word2Str(word) {
   res.synos = word.synos.map(v => (v.pos + v.cn + '\n' + v.ws.join('/')).replaceAll('"', '')).join('\n\n')
   res.relWords = word.relWords.root
     ? '词根:' +
-      word.relWords.root +
-      '\n\n' +
-      word.relWords.rels
-        .map(v => (v.pos + '\n' + v.words.map(v => v.c + ':' + v.cn).join('\n')).replaceAll('"', ''))
-        .join('\n\n')
+    word.relWords.root +
+    '\n\n' +
+    word.relWords.rels
+      .map(v => (v.pos + '\n' + v.words.map(v => v.c + ':' + v.cn).join('\n')).replaceAll('"', ''))
+      .join('\n\n')
     : ''
   res.etymology = word.etymology.map(v => (v.t + '\n' + v.d).replaceAll('"', '')).join('\n\n')
   return res

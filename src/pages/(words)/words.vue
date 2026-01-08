@@ -24,14 +24,14 @@ import Toast from '@/components/base/toast/Toast.ts'
 import BaseButton from '@/components/BaseButton.vue'
 import { getDefaultDict } from '@/types/func.ts'
 import DeleteIcon from '@/components/icon/DeleteIcon.vue'
-import PracticeSettingDialog from '@/pages/word/components/PracticeSettingDialog.vue'
-import ChangeLastPracticeIndexDialog from '@/pages/word/components/ChangeLastPracticeIndexDialog.vue'
+import PracticeSettingDialog from '@/components/word/components/PracticeSettingDialog.vue'
+import ChangeLastPracticeIndexDialog from '@/components/word/components/ChangeLastPracticeIndexDialog.vue'
 import { useSettingStore } from '@/stores/setting.ts'
 import { useFetch } from '@vueuse/core'
 import { AppEnv, DICT_LIST, Host, LIB_JS_URL, Origin, TourConfig, WordPracticeModeNameMap } from '@/config/env.ts'
 import { myDictList } from '@/apis'
-import PracticeWordListDialog from '@/pages/word/components/PracticeWordListDialog.vue'
-import ShufflePracticeSettingDialog from '@/pages/word/components/ShufflePracticeSettingDialog.vue'
+import PracticeWordListDialog from '@/components/word/components/PracticeWordListDialog.vue'
+import ShufflePracticeSettingDialog from '@/components/word/components/ShufflePracticeSettingDialog.vue'
 import { deleteDict } from '@/apis/dict.ts'
 import OptionButton from '@/components/base/OptionButton.vue'
 import { getPracticeWordCache, setPracticeWordCache } from '@/utils/cache.ts'
@@ -355,7 +355,7 @@ const systemPracticeText = $computed(() => {
               {{ isSaveData ? '上次任务' : '今日任务' }}
             </div>
             <span class="color-link cursor-pointer" v-if="store.sdict.id" @click="showPracticeWordListDialog = true"
-              >词表</span
+            >词表</span
             >
           </div>
           <div class="flex gap-1 items-center" v-if="store.sdict.id">

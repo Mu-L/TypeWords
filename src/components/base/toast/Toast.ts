@@ -1,5 +1,5 @@
 import {createVNode, render} from 'vue'
-import ToastComponent from '@/components/base/toast/Toast.vue'
+import ToastComponent from '@/components/base/toast/ToastComponent.vue'
 import type {ToastOptions, ToastInstance, ToastService} from '@/components/base/toast/type.ts'
 
 interface ToastContainer {

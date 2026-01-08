@@ -4,7 +4,7 @@ import Switch from "@/components/base/Switch.vue";
 import RadioGroup from "@/components/base/radio/RadioGroup.vue";
 import InputNumber from "@/components/base/InputNumber.vue";
 import Slider from "@/components/base/Slider.vue";
-import SettingItem from "@/pages/setting/SettingItem.vue";
+import SettingItem from "@/components/setting/SettingItem.vue";
 import Radio from "@/components/base/radio/Radio.vue";
 import { useSettingStore } from "@/stores/setting.ts";
 const settingStore = useSettingStore()

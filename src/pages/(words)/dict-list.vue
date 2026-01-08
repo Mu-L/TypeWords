@@ -70,10 +70,10 @@ const searchList = computed<any[]>(() => {
     let s = searchKey.toLowerCase()
     return dict_list.value.filter((item) => {
       return item.id.toLowerCase().includes(s)
-          || item.name.toLowerCase().includes(s)
-          || item.category.toLowerCase().includes(s)
-          || item.tags.join('').replace('所有', '').toLowerCase().includes(s)
-          || item?.url?.toLowerCase?.().includes?.(s)
+        || item.name.toLowerCase().includes(s)
+        || item.category.toLowerCase().includes(s)
+        || item.tags.join('').replace('所有', '').toLowerCase().includes(s)
+        || item?.url?.toLowerCase?.().includes?.(s)
     })
   }
   return []
@@ -125,31 +125,31 @@ watch(dict_list, (val) => {
         <div class="py-1 flex flex-1 justify-end" v-else>
           <span class="page-title absolute w-full center">词典列表</span>
           <BaseIcon
-              title="搜索"
-              @click="showSearchInput = true"
-              class="z-1"
-              icon="fluent:search-24-regular">
+            title="搜索"
+            @click="showSearchInput = true"
+            class="z-1"
+            icon="fluent:search-24-regular">
             <IconFluentSearch24Regular/>
           </BaseIcon>
         </div>
       </div>
       <div class="mt-4" v-if="searchKey">
         <DictList
-            v-if="searchList.length "
-            @selectDict="selectDict"
-            :list="searchList"
-            quantifier="词"
-            :select-id="'-1'"/>
+          v-if="searchList.length "
+          @selectDict="selectDict"
+          :list="searchList"
+          quantifier="词"
+          :select-id="'-1'"/>
         <Empty v-else text="没有相关词典"/>
       </div>
       <div class="w-full" v-else>
         <DictGroup
-            v-for="item in groupedByCategoryAndTag"
-            :select-id="store.sdict.id"
-            @selectDict="selectDict"
-            quantifier="词"
-            :groupByTag="item[1]"
-            :category="item[0]"
+          v-for="item in groupedByCategoryAndTag"
+          :select-id="store.sdict.id"
+          @selectDict="selectDict"
+          quantifier="词"
+          :groupByTag="item[1]"
+          :category="item[0]"
         />
       </div>
     </div>

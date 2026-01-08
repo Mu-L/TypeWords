@@ -241,7 +241,7 @@ onMounted(init)
       </div>
     </div>
   </BasePage>
-  </template>
+</template>
 
 <style scoped>
 .option:hover { background: var(--color-second); }

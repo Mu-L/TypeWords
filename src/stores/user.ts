@@ -1,8 +1,8 @@
 import {defineStore} from 'pinia'
 import {ref} from 'vue'
-import {getUserInfo, User} from '@/apis/user.ts'
-import {AppEnv} from "@/config/env.ts";
-import Toast from "@/components/base/toast/Toast.ts";
+import {getUserInfo, User} from '@/apis/user'
+import {AppEnv} from "@/config/env";
+import Toast from "@/components/base/toast/Toast";
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<User | null>(null)

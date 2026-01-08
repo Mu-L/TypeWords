@@ -9,7 +9,7 @@ import { useWindowClick } from '@/hooks/event.ts'
 import { MessageBox } from '@/utils/MessageBox.tsx'
 import { useRuntimeStore } from '@/stores/runtime.ts'
 import { nanoid } from 'nanoid'
-import EditArticle from '@/pages/article/components/EditArticle.vue'
+import EditArticle from '@/components/article/components/EditArticle.vue'
 import Toast from '@/components/base/toast/Toast.ts'
 import { getDefaultArticle } from '@/types/func.ts'
 import BackIcon from '@/components/BackIcon.vue'
@@ -283,7 +283,7 @@ function updateList(e) {
                 :loading="exportLoading"
                 :disabled="!article.id"
                 @click="exportData({ type: 'item', data: article })"
-                >当前
+              >当前
               </BaseButton>
             </div>
           </MiniDialog>

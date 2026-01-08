@@ -1,8 +1,8 @@
-import type { Article, ArticleWord, Dict, Word } from '@/types/types.ts'
+import type { Article, ArticleWord, Dict, Word } from '@/types/types'
 import { shallowReactive } from "vue";
 import { cloneDeep } from "@/utils";
 import { nanoid } from "nanoid";
-import { DictType, PracticeArticleWordType } from '@/types/enum.ts'
+import { DictType, PracticeArticleWordType } from '@/types/enum'
 
 export function getDefaultWord(val: Partial<Word> = {}): Word {
   return {

@@ -7,12 +7,12 @@ import type { Article, Dict } from '@/types/types'
 import { useRuntimeStore } from '@/stores/runtime.ts'
 import BaseButton from '@/components/BaseButton.vue'
 import { useRoute, useRouter } from 'vue-router'
-import EditBook from '@/pages/article/components/EditBook.vue'
+import EditBook from '@/components/article/components/EditBook.vue'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { _dateFormat, _getDictDataByUrl, _nextTick, msToHourMinute, resourceWrap, total, useNav } from '@/utils'
 import { getDefaultArticle, getDefaultDict } from '@/types/func.ts'
 import Toast from '@/components/base/toast/Toast.ts'
-import ArticleAudio from '@/pages/article/components/ArticleAudio.vue'
+import ArticleAudio from '@/components/article/components/ArticleAudio.vue'
 import { MessageBox } from '@/utils/MessageBox.tsx'
 import { useSettingStore } from '@/stores/setting.ts'
 import { useFetch } from '@vueuse/core'
@@ -319,7 +319,7 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                               v-for="(s, n) in w.split(' ').filter(Boolean)"
                               :class="`inline-block word-${i}-${j}-${n}`"
                               :key="`${i}-${j}-${n}`"
-                              ><span>{{ s }}</span>
+                            ><span>{{ s }}</span>
                               <span class="space"></span>
                             </span>
                           </span>

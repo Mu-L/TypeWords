@@ -1,15 +1,15 @@
-import { BaseState, getDefaultBaseState, useBaseStore } from '@/stores/base.ts'
-import { getDefaultSettingState, SettingState } from '@/stores/setting.ts'
-import type { Dict, DictResource } from '@/types/types.ts'
+import { BaseState, getDefaultBaseState, useBaseStore } from '@/stores/base'
+import { getDefaultSettingState, SettingState } from '@/stores/setting'
+import type { Dict, DictResource } from '@/types/types'
 import { useRouter } from 'vue-router'
-import { useRuntimeStore } from '@/stores/runtime.ts'
+import { useRuntimeStore } from '@/stores/runtime'
 import dayjs from 'dayjs'
-import { AppEnv, DictId, RESOURCE_PATH, SAVE_DICT_KEY, SAVE_SETTING_KEY } from '@/config/env.ts'
+import { AppEnv, DictId, ENV, RESOURCE_PATH, SAVE_DICT_KEY, SAVE_SETTING_KEY } from '@/config/env'
 import { nextTick } from 'vue'
-import Toast from '@/components/base/toast/Toast.ts'
-import { getDefaultDict, getDefaultWord } from '@/types/func.ts'
+import Toast from '@/components/base/toast/Toast'
+import { getDefaultDict, getDefaultWord } from '@/types/func'
 import duration from 'dayjs/plugin/duration'
-import {DictType} from "@/types/enum.ts";
+import { DictType } from '@/types/enum'
 
 dayjs.extend(duration)
 
@@ -61,9 +61,7 @@ export function checkAndUpgradeSaveDict(val: any) {
         return defaultState
       } else {
         // 版本不匹配时，尽量保留数据而不是直接返回默认状态
-        console.warn(
-          `数据版本不匹配: 当前版本 ${version}, 期望版本 ${SAVE_DICT_KEY.version}，尝试保留数据`
-        )
+        console.warn(`数据版本不匹配: 当前版本 ${version}, 期望版本 ${SAVE_DICT_KEY.version}，尝试保留数据`)
         try {
           checkRiskKey(defaultState, state)
           // 尝试保留 bookList 数据
@@ -136,8 +134,7 @@ export function checkAndUpgradeSaveSetting(val: any) {
 export function shakeCommonDict(n: BaseState): BaseState {
   let data: BaseState = cloneDeep(n)
   data.word.bookList.map((v: Dict) => {
-    if (!v.custom && ![DictId.wordKnown, DictId.wordWrong, DictId.wordCollect].includes(v.id))
-      v.words = []
+    if (!v.custom && ![DictId.wordKnown, DictId.wordWrong, DictId.wordCollect].includes(v.id)) v.words = []
   })
   data.article.bookList.map((v: Dict) => {
     if (!v.custom && ![DictId.articleCollect].includes(v.id)) v.articles = []
@@ -248,14 +245,11 @@ export async function sleep(time: number) {
   return new Promise(resolve => setTimeout(resolve, time))
 }
 
-export async function _getDictDataByUrl(
-  val: DictResource,
-  type: DictType = DictType.word
-): Promise<Dict> {
+export async function _getDictDataByUrl(val: DictResource, type: DictType = DictType.word): Promise<Dict> {
   // await sleep(2000);
-  let dictResourceUrl = `https://dicts.2study.top/dicts/${val.language}/word/${val.url}`
+  let dictResourceUrl = ENV.RESOURCE_URL + `dicts/${val.language}/word/${val.url}`
   if (type === DictType.article) {
-    dictResourceUrl = `https://dicts.2study.top/dicts/${val.language}/article/${val.url}`
+    dictResourceUrl = ENV.RESOURCE_URL + `dicts/${val.language}/article/${val.url}`
   }
   let s = await fetch(resourceWrap(dictResourceUrl, val.version)).then(r => r.json())
   if (s) {
@@ -271,8 +265,7 @@ export async function _getDictDataByUrl(
 //从字符串里面转换为Word格式
 export function convertToWord(raw: any) {
   const safeString = str => (typeof str === 'string' ? str.trim() : '')
-  const safeSplit = (str, sep) =>
-    safeString(str) ? safeString(str).split(sep).filter(Boolean) : []
+  const safeSplit = (str, sep) => (safeString(str) ? safeString(str).split(sep).filter(Boolean) : [])
 
   // 1. trans
   const trans = safeSplit(raw.trans, '\n').map(line => {
@@ -508,9 +501,7 @@ export async function isNewUser() {
   let base = useBaseStore()
   console.log(JSON.stringify(base.$state))
   console.log(JSON.stringify(getDefaultBaseState()))
-  return (
-    JSON.stringify(base.$state) === JSON.stringify({ ...getDefaultBaseState(), ...{ load: true } })
-  )
+  return JSON.stringify(base.$state) === JSON.stringify({ ...getDefaultBaseState(), ...{ load: true } })
 }
 
 export function jump2Feedback() {

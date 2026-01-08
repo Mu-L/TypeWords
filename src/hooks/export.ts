@@ -8,15 +8,15 @@ import {
   Origin,
   SAVE_DICT_KEY,
   SAVE_SETTING_KEY,
-} from '@/config/env.ts'
+} from '@/config/env'
 import { get } from 'idb-keyval'
 import { saveAs } from 'file-saver'
 import dayjs from 'dayjs'
-import Toast from '@/components/base/toast/Toast.ts'
-import { useBaseStore } from '@/stores/base.ts'
-import { useSettingStore } from '@/stores/setting.ts'
+import Toast from '@/components/base/toast/Toast'
+import { useBaseStore } from '@/stores/base'
+import { useSettingStore } from '@/stores/setting'
 import { ref } from 'vue'
-import { PRACTICE_ARTICLE_CACHE, PRACTICE_WORD_CACHE } from '@/utils/cache.ts'
+import { PRACTICE_ARTICLE_CACHE, PRACTICE_WORD_CACHE } from '@/utils/cache'
 
 export function useExport() {
   const store = useBaseStore()

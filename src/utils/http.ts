@@ -1,7 +1,7 @@
-import axios, {AxiosInstance} from 'axios'
+import axios from 'axios'
+import type {AxiosInstance} from 'axios'
 import {AppEnv, ENV} from "@/config/env.ts";
 import Toast from "@/components/base/toast/Toast.ts";
-import App from "@/App.vue";
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: ENV.API,

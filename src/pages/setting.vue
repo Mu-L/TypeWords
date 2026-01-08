@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
-import { useSettingStore } from '@/stores/setting.ts'
-import { getShortcutKey, useEventListener } from '@/hooks/event.ts'
+import { useSettingStore } from '@/stores/setting'
+import { getShortcutKey, useEventListener } from '@/hooks/event'
 import { checkAndUpgradeSaveDict, checkAndUpgradeSaveSetting, cloneDeep, loadJsLib, sleep } from '@/utils'
 import BaseButton from '@/components/BaseButton.vue'
-import { useBaseStore } from '@/stores/base.ts'
+import { useBaseStore } from '@/stores/base'
 import {
   APP_NAME,
   APP_VERSION,
@@ -14,19 +14,19 @@ import {
   IS_DEV,
   LIB_JS_URL,
   LOCAL_FILE_KEY,
-} from '@/config/env.ts'
+} from '@/config/env'
 import BasePage from '@/components/BasePage.vue'
-import Toast from '@/components/base/toast/Toast.ts'
+import Toast from '@/components/base/toast/Toast'
 import { set } from 'idb-keyval'
-import { useRuntimeStore } from '@/stores/runtime.ts'
-import { useExport } from '@/hooks/export.ts'
+import { useRuntimeStore } from '@/stores/runtime'
+import { useExport } from '@/hooks/export'
 import MigrateDialog from '@/components/MigrateDialog.vue'
-import Log from '@/pages/setting/Log.vue'
+import Log from '@/components/setting/Log.vue'
 import About from '@/components/About.vue'
 import CommonSetting from '@/components/setting/CommonSetting.vue'
 import ArticleSetting from '@/components/setting/ArticleSetting.vue'
 import WordSetting from '@/components/setting/WordSetting.vue'
-import { PRACTICE_ARTICLE_CACHE, PRACTICE_WORD_CACHE } from '@/utils/cache.ts'
+import { PRACTICE_ARTICLE_CACHE, PRACTICE_WORD_CACHE } from '@/utils/cache'
 
 const emit = defineEmits<{
   toggleDisabledDialogEscKey: [val: boolean]
