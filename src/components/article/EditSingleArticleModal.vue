@@ -2,7 +2,7 @@
 
 import type {Article} from "@/types/types.ts";
 import {useDisableEventListener} from "@/hooks/event.ts";
-import EditArticle from "@/components/article/components/EditArticle.vue";
+import EditArticle from "@/components/article/EditArticle.vue";
 import {getDefaultArticle} from "@/types/func.ts";
 import {defineAsyncComponent} from "vue";
 

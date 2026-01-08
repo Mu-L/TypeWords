@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { inject, Ref } from 'vue'
-import { usePracticeStore } from '@/stores/practice'
-import { useSettingStore } from '@/stores/setting'
-import type { PracticeData, TaskWords } from '@/types/types'
+import { usePracticeStore } from '@/stores/practice.ts'
+import { useSettingStore } from '@/stores/setting.ts'
+import type { PracticeData, TaskWords } from '@/types/types.ts'
 import BaseIcon from '@/components/BaseIcon.vue'
 import Tooltip from '@/components/base/Tooltip.vue'
 import SettingDialog from '@/components/setting/SettingDialog.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import { useBaseStore } from '@/stores/base'
-import VolumeSettingMiniDialog from '@/components/word/components/VolumeSettingMiniDialog.vue'
+import { useBaseStore } from '@/stores/base.ts'
+import VolumeSettingMiniDialog from '@/components/word/VolumeSettingMiniDialog.vue'
 import StageProgress from '@/components/StageProgress.vue'
-import { ShortcutKey, WordPracticeMode, WordPracticeStage } from '@/types/enum'
-import { WordPracticeModeNameMap, WordPracticeModeStageMap, WordPracticeStageNameMap } from '@/config/env'
+import { ShortcutKey, WordPracticeMode, WordPracticeStage } from '@/types/enum.ts'
+import { WordPracticeModeNameMap, WordPracticeModeStageMap, WordPracticeStageNameMap } from '@/config/env.ts'
 
 const statStore = usePracticeStore()
 const store = useBaseStore()
