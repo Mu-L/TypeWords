@@ -29,6 +29,10 @@ const router = useRouter()
 const route = useRoute()
 const { nav } = useNav()
 
+// useHead({
+//   title: `${runtimeStore.editDict.name ?? ''}`,
+// })
+
 let isEdit = $ref(false)
 let isAdd = $ref(false)
 let studyLoading = $ref(false)
@@ -318,7 +322,7 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                               v-for="(s, n) in w.split(' ').filter(Boolean)"
                               :class="`inline-block word-${i}-${j}-${n}`"
                               :key="`${i}-${j}-${n}`"
-                            ><span>{{ s }}</span>
+                              ><span>{{ s }}</span>
                               <span class="space"></span>
                             </span>
                           </span>

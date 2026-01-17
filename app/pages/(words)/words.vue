@@ -28,7 +28,16 @@ import PracticeSettingDialog from '~/components/word/PracticeSettingDialog.vue'
 import ChangeLastPracticeIndexDialog from '~/components/word/ChangeLastPracticeIndexDialog.vue'
 import { useSettingStore } from '@/stores/setting.ts'
 import { useFetch } from '@vueuse/core'
-import { AppEnv, DICT_LIST, Host, LIB_JS_URL, Origin, TourConfig, WordPracticeModeNameMap } from '@/config/env.ts'
+import {
+  APP_NAME,
+  AppEnv,
+  DICT_LIST,
+  Host,
+  LIB_JS_URL,
+  Origin,
+  TourConfig,
+  WordPracticeModeNameMap,
+} from '@/config/env.ts'
 import { myDictList } from '@/apis'
 import PracticeWordListDialog from '~/components/word/PracticeWordListDialog.vue'
 import ShufflePracticeSettingDialog from '~/components/word/ShufflePracticeSettingDialog.vue'
@@ -45,6 +54,9 @@ const runtimeStore = useRuntimeStore()
 let loading = $ref(true)
 let isSaveData = $ref(false)
 
+useHead({
+  title: APP_NAME + ' 单词',
+})
 let currentStudy = $ref({
   new: [],
   review: [],
@@ -292,7 +304,7 @@ const systemPracticeText = $computed(() => {
             <IconFluentBookNumber20Filled class="text-xl color-link" />
           </div>
           <div @click="goDictDetail(store.sdict)" class="text-2xl font-bold cursor-pointer">
-            {{  store.sdict.name || '当前无正在学习的词典' }}
+            {{ store.sdict.name || '当前无正在学习的词典' }}
           </div>
         </div>
 

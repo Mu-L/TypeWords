@@ -8,7 +8,7 @@ import BasePage from '@/components/BasePage.vue'
 import Book from '@/components/Book.vue'
 import DeleteIcon from '@/components/icon/DeleteIcon.vue'
 import PopConfirm from '@/components/PopConfirm.vue'
-import { AppEnv, DICT_LIST, Host, LIB_JS_URL, TourConfig } from '@/config/env.ts'
+import { APP_NAME, AppEnv, DICT_LIST, Host, LIB_JS_URL, TourConfig } from '@/config/env.ts'
 import { useBaseStore } from '@/stores/base.ts'
 import { useRuntimeStore } from '@/stores/runtime.ts'
 import { useSettingStore } from '@/stores/setting.ts'
@@ -26,6 +26,10 @@ import { DictType } from '@/types/enum.ts'
 
 dayjs.extend(isoWeek)
 dayjs.extend(isBetween)
+
+useHead({
+  title: APP_NAME + ' 文章',
+})
 
 const { nav } = useNav()
 const base = useBaseStore()

@@ -18,24 +18,20 @@ const { toggleTheme, getTheme, setTheme } = useTheme()
 const store = useBaseStore()
 const runtimeStore = useRuntimeStore()
 const settingStore = useSettingStore()
-
 let expand = $ref(false)
-watch(
-  () => settingStore.sideExpand,
-  n => {
-    if (import.meta.client) {
-      expand = n
-      document.documentElement.style.setProperty('--aside-width', n ? '12rem' : '4.5rem')
-    }
-  },
-  { immediate: true }
-)
-
 const init = useInit()
+
+function toggleExpand(n: boolean) {
+  expand = n
+  document.documentElement.style.setProperty('--aside-width', n ? '12rem' : '4.5rem')
+}
+
+watch(() => settingStore.sideExpand, toggleExpand)
 
 //迁移数据
 let showTransfer = $ref(false)
 onMounted(() => {
+  toggleExpand(settingStore.sideExpand)
   setTheme(settingStore.theme)
 
   if (new URLSearchParams(window.location.search).get('from_old_site') === '1' && location.origin === Origin) {

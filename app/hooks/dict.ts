@@ -226,9 +226,11 @@ export function useGetDict() {
   const router = useRouter()
 
   watch(
-    [() => store.load, () => loading],
+    [() => store.load, loading],
     ([a, b]) => {
-      if (a && b.value) loadDict()
+      if (a && b) {
+        loadDict()
+      }
     },
     { immediate: true }
   )

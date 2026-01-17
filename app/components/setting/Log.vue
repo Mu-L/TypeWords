@@ -1,6 +1,10 @@
 <script setup lang="ts">
 let logList = [
   {
+    date: '2026/01/16',
+    content: '用 Nuxt 重构',
+  },
+  {
     date: '2026/01/06',
     content: '优化书籍详情页面',
   },

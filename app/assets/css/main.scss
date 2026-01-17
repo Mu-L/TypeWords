@@ -14,6 +14,7 @@
   --color-scrollbar: #c1c1c1;
 
   --color-sub-gray: #c0bfbf;
+  --aside-width: 4.5rem;
 
   --article-width: 50vw;
   --article-toolbar-width: 50vw;
@@ -37,7 +38,6 @@
   --color-textarea-bg: white;
   --color-article: black;
 
-  --aside-width: 12rem;
 
   --font-family: -apple-system, sans-serif;
   --word-font-family: ui-monospace, sans-serif;
@@ -237,7 +237,7 @@ a {
   color: var(--color-link);
   @apply hover:opacity-80;
 }
- 
+
 @supports selector(::-webkit-scrollbar) {
   ::-webkit-scrollbar {
     width: 0.5rem;
