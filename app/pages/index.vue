@@ -50,15 +50,15 @@ const { locales, setLocale } = useI18n()
         <NuxtLink to="/articles" class="black-link">
           {{ $t('articles') }}
         </NuxtLink>
-<!--        <NuxtLink to="/nce" class="black-link">-->
-<!--          {{ $t('new_concept_english') }}-->
-<!--        </NuxtLink>-->
+        <!--        <NuxtLink to="/nce" class="black-link">-->
+        <!--          {{ $t('new_concept_english') }}-->
+        <!--        </NuxtLink>-->
         <NuxtLink to="/doc" class="black-link">
           {{ $t('english_document') }}
         </NuxtLink>
       </div>
       <div class="absolute right-6 flex items-center gap-2 color-reverse-black">
-        <NuxtLink to="/qa" class="color-reverse-black" aria-label="Help page">
+        <NuxtLink to="/app/pages/help" class="color-reverse-black" aria-label="Help page">
           <BaseIcon>
             <IconFluentQuestionCircle20Regular />
           </BaseIcon>
@@ -111,7 +111,7 @@ const { locales, setLocale } = useI18n()
       </div>
 
       <div class="w-70vw mb-4 mt-20">
-        <div class="text-4xl font-bold mb-8">{{$t('home_word_practice')}}</div>
+        <div class="text-4xl font-bold mb-8">{{ $t('home_word_practice') }}</div>
         <div class="flex gap-10">
           <ul class="p-0 m-0 list-none space-y-2 shrink-0">
             <li>{{ $t('home_word_practice_desc1') }}</li>
@@ -123,7 +123,7 @@ const { locales, setLocale } = useI18n()
           </div>
         </div>
 
-        <div class="text-4xl font-bold mb-8 mt-20 text-right">{{$t('home_article_practice')}}</div>
+        <div class="text-4xl font-bold mb-8 mt-20 text-right">{{ $t('home_article_practice') }}</div>
         <div class="flex gap-14 w-full">
           <div class="flex-1">
             <NuxtImg src="/imgs/articles.png" class="rounded-xl w-full" />
@@ -135,7 +135,7 @@ const { locales, setLocale } = useI18n()
           </ul>
         </div>
 
-        <div class="text-4xl font-bold mb-8 mt-20 text-center">{{$t('function_desc')}}</div>
+        <div class="text-4xl font-bold mb-8 mt-20 text-center">{{ $t('function_desc') }}</div>
         <div class="card-wrap">
           <div class="card1 hover">
             <div class="emoji">📚</div>
@@ -225,18 +225,16 @@ const { locales, setLocale } = useI18n()
       </div>
     </div>
 
-    <div>
-      <div class="line"></div>
-      <div class="w-full center gap-4 mt-6 mb-12">
-        <channel-icons type="horizontal" :share="false" />
-        <a
-          href="https://beian.mps.gov.cn/#/query/webSearch?code=51015602001426"
-          target="_blank"
-          class="black-link text-sm"
-          >{{ $t('cn_limit_no1') }}
-        </a>
-        <a href="https://beian.miit.gov.cn/" class="black-link text-sm" target="_blank">{{ $t('cn_limit_no2') }}</a>
-      </div>
+    <div class="line"></div>
+    <div class="w-full center gap-4 h-20">
+      <channel-icons type="horizontal" :share="false" />
+      <a
+        href="https://beian.mps.gov.cn/#/query/webSearch?code=51015602001426"
+        target="_blank"
+        class="black-link text-sm"
+        >{{ $t('cn_limit_no1') }}
+      </a>
+      <a href="https://beian.miit.gov.cn/" class="black-link text-sm" target="_blank">{{ $t('cn_limit_no2') }}</a>
     </div>
   </div>
 </template>
@@ -276,7 +274,6 @@ const { locales, setLocale } = useI18n()
     'Apple Color Emoji',
     'Segoe UI Emoji';
   //color: var(--color-card-text);
-  @apply flex flex-col justify-between min-h-screen;
 
   .content {
     @apply mt-16 flex flex-col items-center gap-8;

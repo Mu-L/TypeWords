@@ -43,6 +43,11 @@ onMounted(() => {
 })
 
 const { locales, setLocale } = useI18n()
+const route = useRoute()
+
+const showIcon = $computed(() => {
+  return ['/words', '/articles', '/setting', '/help', '/doc', '/feedback'].includes(route.path)
+})
 </script>
 
 <template>
@@ -87,49 +92,25 @@ const { locales, setLocale } = useI18n()
           <IconFluentChevronLeft20Filled v-if="expand" />
           <IconFluentChevronLeft20Filled class="transform-rotate-180" v-else />
         </BaseIcon>
-
-        <div class="relative group" v-if="expand">
-          <BaseIcon>
-            <IconPhTranslate />
-          </BaseIcon>
-          <div
-            class="space-y-2 btn-no-margin pt-2 absolute z-2 left-1/2 -transform-translate-x-1/2 bottom-full opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
-          >
-            <div class="card mb-2 py-4 px-6 space-y-3">
-              <div v-for="locale in locales" @click="setLocale(locale.code)" class="w-full cp break-keep black-link">
-                {{ locale.name }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <BaseIcon
-          v-if="expand"
-          :title="`${$t('toggle_theme')}(${settingStore.shortcutKeyMap[ShortcutKey.ToggleTheme]})`"
-          @click="toggleTheme"
-        >
-          <IconFluentWeatherMoon16Regular v-if="getTheme() === 'light'" />
-          <IconFluentWeatherSunny16Regular v-else />
-        </BaseIcon>
       </div>
     </div>
 
     <!-- 移动端顶部菜单栏 -->
     <div class="mobile-top-nav" :class="{ collapsed: settingStore.mobileNavCollapsed }">
       <div class="nav-items">
-        <div class="nav-item" @click="router.push('/')" :class="{ active: $route.path === '/' }">
+        <div class="nav-item" @click="router.push('/')" :class="{ active: route.path === '/' }">
           <IconFluentHome20Regular />
           <span>主页</span>
         </div>
-        <div class="nav-item" @click="router.push('/words')" :class="{ active: $route.path.includes('/words') }">
+        <div class="nav-item" @click="router.push('/words')" :class="{ active: route.path.includes('/words') }">
           <IconFluentTextUnderlineDouble20Regular />
           <span>单词</span>
         </div>
-        <div class="nav-item" @click="router.push('/articles')" :class="{ active: $route.path.includes('/articles') }">
+        <div class="nav-item" @click="router.push('/articles')" :class="{ active: route.path.includes('/articles') }">
           <IconFluentBookLetter20Regular />
           <span>文章</span>
         </div>
-        <div class="nav-item" @click="router.push('/setting')" :class="{ active: $route.path === '/setting' }">
+        <div class="nav-item" @click="router.push('/setting')" :class="{ active: route.path === '/setting' }">
           <IconFluentSettings20Regular />
           <span>设置</span>
           <div class="red-point" v-if="runtimeStore.isNew"></div>
@@ -147,6 +128,31 @@ const { locales, setLocale } = useI18n()
 
     <div class="flex-1 z-1 relative main-content overflow-x-hidden">
       <slot></slot>
+
+      <div class="absolute right-4 top-4 flex z-1 gap-2" v-if="showIcon">
+        <div class="relative group">
+          <BaseIcon>
+            <IconPhTranslate />
+          </BaseIcon>
+          <div
+            class="space-y-2 pt-2 absolute z-2 right-0 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
+          >
+            <div class="card mb-2 py-4 px-6 space-y-3">
+              <div v-for="locale in locales" @click="setLocale(locale.code)" class="w-full cp break-keep black-link">
+                {{ locale.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <BaseIcon
+          :title="`${$t('toggle_theme')}(${settingStore.shortcutKeyMap[ShortcutKey.ToggleTheme]})`"
+          @click="toggleTheme"
+        >
+          <IconFluentWeatherMoon16Regular v-if="getTheme() === 'light'" />
+          <IconFluentWeatherSunny16Regular v-else />
+        </BaseIcon>
+      </div>
     </div>
   </div>
 </template>
@@ -177,22 +183,16 @@ const { locales, setLocale } = useI18n()
     }
   }
   .row {
-    @apply cursor-pointer rounded-md text p-2 my-2 flex items-center gap-2 relative shrink-0;
+    @apply cp rounded-md text p-2 my-2 flex items-center gap-2 relative shrink-0 hover:bg-fourth;
     transition: all 0.5s;
     color: var(--color-main-text);
 
-    &:hover {
-      background: var(--btn-primary);
-      color: white;
-    }
-
-    span {
-      flex-shrink: 0;
+    &.router-link-active {
+      background: var(--color-fourth);
     }
 
     svg {
-      flex-shrink: 0;
-      font-size: 1.3rem !important;
+      @apply shrink-0 text-lg;
     }
   }
 }

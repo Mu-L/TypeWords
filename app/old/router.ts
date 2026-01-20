@@ -17,7 +17,7 @@
 // import user from "@/pages/(user)/user.vue";
 // import vip from "@/pages/(user)/vip.vue";
 // import feedback from "@/pages/feedback.vue";
-// import qa from "@/pages/qa.vue";
+// import qa from "@/pages/help.vue";
 // import doc from "@/pages/doc.vue";
 // // import { useAuthStore } from "@/stores/user";
 //

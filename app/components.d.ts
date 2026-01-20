@@ -101,6 +101,7 @@ declare module 'vue' {
     IconMdiSparkles: typeof import('~icons/mdi/sparkles')['default']
     IconPhExportLight: typeof import('~icons/ph/export-light')['default']
     IconPhMicrosoftWordLogoLight: typeof import('~icons/ph/microsoft-word-logo-light')['default']
+    IconPhTranslate: typeof import('~icons/ph/translate')['default']
     IconRiTwitterFill: typeof import('~icons/ri/twitter-fill')['default']
     IconSimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']
     IconSimpleIconsWechat: typeof import('~icons/simple-icons/wechat')['default']

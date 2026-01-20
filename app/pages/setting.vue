@@ -489,13 +489,11 @@ function transferOk() {
         }
 
         &:hover {
-          background: var(--btn-primary);
-          color: white;
+          background: var(--color-fourth);
         }
 
         &.active {
-          background: var(--btn-primary);
-          color: white;
+          background: var(--color-fourth);
         }
       }
     }
