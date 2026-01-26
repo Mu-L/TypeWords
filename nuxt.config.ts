@@ -85,6 +85,7 @@ export default defineNuxtConfig({
       ],
     },
   },
+  // ssr: false,
   routeRules: {
     '/words': { ssr: false },
     '/articles': { ssr: false },
@@ -160,8 +161,6 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vue-virtual-scroller'],
   },
-  // SSR 配置
-  ssr: true, // 默认启用 SSR
   // 实验性功能
   experimental: {
     payloadExtraction: false, // 禁用 payload 提取，减少构建体积
