@@ -45,7 +45,7 @@ const config = useRuntimeConfig()
 // console.log('runtimeConfig ',config)
 //@ts-ignore
 // const gitLastCommitHash = ref(LATEST_COMMIT_HASH)
-const gitLastCommitHash = ref(config.public?.latestCommitHash)
+const gitLastCommitHash = ref(config?.public?.latestCommitHash)
 
 let editShortcutKey = $ref('')
 
@@ -382,7 +382,7 @@ function transferOk() {
                       @blur="handleInputBlur"
                     />
                     <span @click.stop="editShortcutKey = ''"
-                    >{{ $t('press_key_to_set') }}，<span class="text-red!">{{
+                      >{{ $t('press_key_to_set') }}，<span class="text-red!">{{
                         $t('click_here_when_done')
                       }}</span></span
                     >
@@ -408,20 +408,20 @@ function transferOk() {
               您需要手动进行数据导出和导入
             </div>
             <BaseButton :loading="exportLoading" size="large" class="mt-3" @click="exportData()">{{
-                $t('export_data_backup')
-              }}</BaseButton>
+              $t('export_data_backup')
+            }}</BaseButton>
             <div class="text-gray text-sm mt-2">💾 导出的ZIP文件包含所有学习数据，可在其他设备上导入恢复</div>
 
             <div class="line mt-15 mb-3"></div>
 
             <div>
               请注意，导入数据将<b class="text-red"> 完全覆盖 </b
-            >当前所有数据，请谨慎操作。执行导入操作时，会先自动备份当前数据到您的电脑中，供您随时恢复
+              >当前所有数据，请谨慎操作。执行导入操作时，会先自动备份当前数据到您的电脑中，供您随时恢复
             </div>
             <div class="flex gap-space mt-3">
               <BaseButton size="large" @click="beforeImport" :loading="importLoading">{{
-                  $t('import_data_restore')
-                }}</BaseButton>
+                $t('import_data_restore')
+              }}</BaseButton>
               <input
                 type="file"
                 id="import"
@@ -435,7 +435,7 @@ function transferOk() {
               <div class="line my-3"></div>
               <div>
                 请注意，如果本地已有使用记录，请先备份当前数据，迁移数据后将<b class="text-red"> 完全覆盖 </b
-              >当前所有数据，请谨慎操作。
+                >当前所有数据，请谨慎操作。
               </div>
               <div class="flex gap-space mt-3">
                 <BaseButton @click="showTransfer = true">迁移 2study.top 网站数据</BaseButton>
