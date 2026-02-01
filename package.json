@@ -5,7 +5,8 @@
     "generate": "pnpm -F @typewords/nuxt generate",
     "build:vscode-web": "pnpm -F @typewords/vscode-web build",
     "build-all": "pnpm run generate && pnpm run build:vscode-web",
-    "test": ""
+    "test": "",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",

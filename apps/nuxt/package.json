@@ -14,7 +14,6 @@
     "build-tsc": "vue-tsc && vite build",
     "report": "vite build",
     "report-oss": "vite build",
-    "commit": "git-cz",
-    "prepare": "husky install"
+    "commit": "git-cz"
   }
 }
