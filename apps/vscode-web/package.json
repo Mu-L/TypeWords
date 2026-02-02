@@ -1,0 +1,22 @@
+{
+  "name": "@typewords/vscode-web",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "test": "",
+    "build": "vite build && node ../../scripts/deploy-eo-pages.js --dir dist --name vscode-web-deploy",
+    "build-tsc": "vue-tsc && vite build",
+    "report": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@typewords/ui": "workspace:*"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
