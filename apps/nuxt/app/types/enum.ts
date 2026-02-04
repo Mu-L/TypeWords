@@ -58,6 +58,7 @@ export enum WordPracticeMode {
   ListenOnly = 4, // 独立听写模式
   Shuffle = 5, // 随机复习模式
   Review = 6, // 复习模式
+  WordsTest = 7, // 单词测试模式
 }
 
 //练习类型

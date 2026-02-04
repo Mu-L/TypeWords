@@ -158,14 +158,23 @@ function startPractice(practiceMode: WordPracticeMode, resetCache: boolean = fal
   }
 }
 
+function startWordsTest() {
+  settingStore.wordPracticeMode = WordPracticeMode.WordsTest
+  nav('words-test/' + store.sdict.id)
+}
+
 function freePractice() {
   startPractice(WordPracticeMode.Free, settingStore.wordPracticeMode !== WordPracticeMode.Free)
 }
 function systemPractice() {
-  startPractice(
-    settingStore.wordPracticeMode === WordPracticeMode.Free ? WordPracticeMode.System : settingStore.wordPracticeMode,
-    settingStore.wordPracticeMode === WordPracticeMode.Free
-  )
+  if (settingStore.wordPracticeMode === WordPracticeMode.WordsTest) {
+    startWordsTest()
+  } else {
+    startPractice(
+      settingStore.wordPracticeMode === WordPracticeMode.Free ? WordPracticeMode.System : settingStore.wordPracticeMode,
+      settingStore.wordPracticeMode === WordPracticeMode.Free
+    )
+  }
 }
 
 let showPracticeSettingDialog = $ref(false)
@@ -450,6 +459,14 @@ const systemPracticeText = $computed(() => {
                 @click="check(() => (showShufflePracticeSettingDialog = true))"
               >
                 {{ $t('random_review') }}
+              </BaseButton>
+              <BaseButton
+                class="w-full"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.WordsTest""
+                :disabled="!currentStudy.review.length && !currentStudy.write.length"
+                @click="startWordsTest()"
+              >
+                {{ $t('words_test') }}
               </BaseButton>
 
               <!--              <BaseButton-->

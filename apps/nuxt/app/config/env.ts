@@ -195,6 +195,7 @@ export const WordPracticeModeNameMap: Record<WordPracticeMode, string> = {
   [WordPracticeMode.ListenOnly]: '听写',
   [WordPracticeMode.Shuffle]: '随机复习',
   [WordPracticeMode.Review]: '复习',
+  [WordPracticeMode.WordsTest]: '单词测试',
 }
 export class DictId {
   static wordCollect = 'wordCollect'

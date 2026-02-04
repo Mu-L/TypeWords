@@ -232,7 +232,7 @@ onMounted(init)
           <span>题目：{{ questions[index].stem.word }}</span>
           <VolumeIcon :simple="true" :title="'发音'" :cb="() => playWordAudio(questions[index].stem.word)"/>
         </div>
-        <div style="height: 20px;"></div>
+       <div class="h-10"></div>
         <div class="grid gap-2">
           <div
             v-for="(opt,i) in questions[index].optionTexts"
