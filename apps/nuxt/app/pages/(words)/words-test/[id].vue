@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import { onMounted } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import VolumeIcon from '@/components/icon/VolumeIcon.vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useBaseStore} from '@/stores/base.ts'
-import type {Dict, Word} from '@/types/types.ts'
-import {_getDictDataByUrl, shuffle} from '@/utils'
-import {useRuntimeStore} from '@/stores/runtime.ts'
-import {usePlayBeep, usePlayCorrect, usePlayWordAudio} from '@/hooks/sound.ts'
+import { useRoute, useRouter } from 'vue-router'
+import { useBaseStore } from '@/stores/base.ts'
+import type { Dict, Word } from '@/types/types.ts'
+import { _getDictDataByUrl, shuffle } from '@/utils'
+import { useRuntimeStore } from '@/stores/runtime.ts'
+import { usePlayBeep, usePlayCorrect, usePlayWordAudio } from '@/hooks/sound.ts'
 import Toast from '@/components/base/toast/Toast.ts'
-import { emitter, EventKey, useEvents } from '~/utils/eventBus'
-import { useStartKeyboardEventListener, getShortcutKey } from '@/hooks/event.ts'
+import { useEvents } from '~/utils/eventBus'
+import { useStartKeyboardEventListener } from '@/hooks/event.ts'
 import { ShortcutKey } from '~/types/enum'
 import { useSettingStore } from '@/stores/setting.ts'
 
-type Candidate = { word: string, wordObj?: Word }
+type Candidate = { word: string; wordObj?: Word }
 type Question = {
-  stem: Word,
-  candidates: Candidate[],
-  optionTexts: string[],
-  correctIndex: number,
-  selectedIndex: number,
+  stem: Word
+  candidates: Candidate[]
+  optionTexts: string[]
+  correctIndex: number
+  selectedIndex: number
   submitted: boolean
 }
 
@@ -37,6 +37,15 @@ let loading = $ref(false)
 let dict = $ref<Dict>()
 let questions = $ref<Question[]>([])
 let index = $ref(0)
+let pageNo = $ref(0)
+let pageSize = $ref(100)
+let wordList = []
+let total = $computed(() => {
+  return (pageNo + 1) * pageSize
+})
+let no = $computed(() => {
+  return pageNo * pageSize + index + 1
+})
 
 function getWordByText(val: string, list: Word[]): Word | undefined {
   let r = list.find(v => v.word.toLowerCase() === val.toLowerCase())
@@ -50,7 +59,7 @@ function pickRelVariant(w: Word, list: Word[]): Candidate | null {
       let c = rels[i].words[j].c
       let r = getWordByText(c, list)
       if (r && r.word.toLowerCase() !== w.word.toLowerCase()) {
-        return {word: r.word, wordObj: r}
+        return { word: r.word, wordObj: r }
       }
     }
   }
@@ -64,7 +73,7 @@ function pickSynonym(w: Word, list: Word[]): Candidate | null {
       let c = synos[i].ws[j]
       let r = getWordByText(c, list)
       if (r && r.word.toLowerCase() !== w.word.toLowerCase()) {
-        return {word: r.word, wordObj: r}
+        return { word: r.word, wordObj: r }
       }
     }
   }
@@ -76,14 +85,14 @@ function pickSamePos(w: Word, list: Word[]): Candidate | null {
   let samePos = list.filter(v => v.word.toLowerCase() !== w.word.toLowerCase() && v.trans?.some(t => t.pos === pos))
   if (samePos.length) {
     let r = samePos[Math.floor(Math.random() * samePos.length)]
-    return {word: r.word, wordObj: r}
+    return { word: r.word, wordObj: r }
   }
   return null
 }
 
 function buildQuestion(w: Word, list: Word[]): Question {
   let candidates: Candidate[] = []
-  candidates.push({word: w.word, wordObj: w})
+  candidates.push({ word: w.word, wordObj: w })
   let c1 = pickRelVariant(w, list) || pickSynonym(w, list) || pickSamePos(w, list)
   let c2 = null as Candidate | null
   let tried = new Set<string>([w.word.toLowerCase()])
@@ -96,16 +105,26 @@ function buildQuestion(w: Word, list: Word[]): Question {
   }
   if (!c1) {
     let rand = list.filter(v => v.word.toLowerCase() !== w.word.toLowerCase())
-    if (rand.length) c1 = {word: rand[Math.floor(Math.random() * rand.length)].word, wordObj: getWordByText(rand[Math.floor(Math.random() * rand.length)].word, list)}
+    if (rand.length)
+      c1 = {
+        word: rand[Math.floor(Math.random() * rand.length)].word,
+        wordObj: getWordByText(rand[Math.floor(Math.random() * rand.length)].word, list),
+      }
   }
   if (!c2) {
-    let rand = list.filter(v => v.word.toLowerCase() !== w.word.toLowerCase() && v.word.toLowerCase() !== c1?.word.toLowerCase())
-    if (rand.length) c2 = {word: rand[Math.floor(Math.random() * rand.length)].word, wordObj: getWordByText(rand[Math.floor(Math.random() * rand.length)].word, list)}
+    let rand = list.filter(
+      v => v.word.toLowerCase() !== w.word.toLowerCase() && v.word.toLowerCase() !== c1?.word.toLowerCase()
+    )
+    if (rand.length)
+      c2 = {
+        word: rand[Math.floor(Math.random() * rand.length)].word,
+        wordObj: getWordByText(rand[Math.floor(Math.random() * rand.length)].word, list),
+      }
   }
   if (c1) candidates.push(c1)
   if (c2) candidates.push(c2)
   const labels = candidates.map(v => formatCandidateText(v))
-  const order = shuffle([0,1,2])
+  const order = shuffle([0, 1, 2])
   const optionTexts = order.map(i => labels[i])
   const correctIndex = order.indexOf(0)
   return {
@@ -114,7 +133,7 @@ function buildQuestion(w: Word, list: Word[]): Question {
     optionTexts,
     correctIndex,
     selectedIndex: -1,
-    submitted: false
+    submitted: false,
   }
 }
 
@@ -166,11 +185,11 @@ async function init() {
   if (!dict.words.length) {
     return Toast.warning('没有单词可测试！')
   }
-  const wordList = shuffle(dict.words)
-  questions = wordList.map(w => buildQuestion(w, dict.words))
+  wordList = shuffle(dict.words)
+  questions = wordList.slice(pageNo * pageSize, (pageNo + 1) * pageSize).map(w => buildQuestion(w, dict.words))
   index = 0
 
-  Toast.info("可以按快捷键进行选择,例如按快捷键[" + aShortcutKey + "]选择A", {duration: 3000})
+  Toast.info('可以按快捷键进行选择,例如按快捷键[' + aShortcutKey + ']选择A', { duration: 3000 })
 }
 
 function select(i: number) {
@@ -191,7 +210,12 @@ function select(i: number) {
 }
 
 function next() {
-  if (index < questions.length - 1) index++
+  if (no < total) index++
+  else {
+    pageNo++
+    index = 0
+    questions = wordList.slice(pageNo * pageSize, (pageNo + 1) * pageSize).map(w => buildQuestion(w, dict.words))
+  }
 }
 
 function end() {
@@ -204,7 +228,7 @@ useEvents([
   [ShortcutKey.ChooseA, () => select(0)],
   [ShortcutKey.ChooseB, () => select(1)],
   [ShortcutKey.ChooseC, () => select(2)],
-  [ShortcutKey.Next, () => next()]
+  [ShortcutKey.Next, () => next()],
 ])
 
 const settingStore = useSettingStore()
@@ -223,30 +247,33 @@ onMounted(init)
     <div class="card flex flex-col">
       <div class="flex items-center justify-between">
         <div class="page-title">测试：{{ dict?.name }}</div>
-        <div class="text-base">{{ index + 1 }} / {{ questions.length }}</div>
+        <div class="text-base">{{ no }} / {{ total }}</div>
       </div>
       <div class="line my-2"></div>
 
       <div v-if="questions.length" class="flex flex-col gap-4">
         <div class="text-2xl en-article-family flex items-center gap-2">
           <span>题目：{{ questions[index].stem.word }}</span>
-          <VolumeIcon :simple="true" :title="'发音'" :cb="() => playWordAudio(questions[index].stem.word)"/>
+          <VolumeIcon :simple="true" :title="'发音'" :cb="() => playWordAudio(questions[index].stem.word)" />
         </div>
-        <div style="height: 20px;"></div>
         <div class="grid gap-2">
           <div
-            v-for="(opt,i) in questions[index].optionTexts"
+            v-for="(opt, i) in questions[index].optionTexts"
             :key="i"
             class="option border rounded p-2 cursor-pointer"
             :class="{
               'text-green-600': questions[index].submitted && i === questions[index].correctIndex,
-              'text-red-600': questions[index].submitted && i === questions[index].selectedIndex && i !== questions[index].correctIndex
+              'text-red-600':
+                questions[index].submitted &&
+                i === questions[index].selectedIndex &&
+                i !== questions[index].correctIndex,
             }"
             @click="select(i)"
           >
             <span>
-              <span class="italic">{{ ['A','B','C'][i] }}</span>  
-              [<span>{{ [aShortcutKey,bShortcutKey,cShortcutKey][i] }}</span>]
+              <span class="italic">{{ ['A', 'B', 'C'][i] }}</span>
+              [<span>{{ [aShortcutKey, bShortcutKey, cShortcutKey][i] }}</span
+              >]
               {{ opt }}
             </span>
           </div>
@@ -255,7 +282,7 @@ onMounted(init)
         <div v-if="questions[index].submitted" class="mt-4">
           <div class="mb-2 text-base">选项解析：</div>
           <div class="grid gap-2 grid-cols-1 md:grid-cols-3">
-            <div v-for="(c,i) in questions[index].candidates" :key="i" class="p-2 rounded bg-[--bg-card-secend]">
+            <div v-for="(c, i) in questions[index].candidates" :key="i" class="p-2 rounded bg-[--bg-card-secend]">
               <div class="en-article-family text-lg">{{ c.word }}</div>
               <div class="mt-1 text-sm">{{ c.wordObj?.trans?.map(v => v.cn).join('；') || '当前词典未收录释义' }}</div>
             </div>
@@ -272,9 +299,11 @@ onMounted(init)
 </template>
 
 <style scoped>
-.option:hover { background: var(--color-second); }
+.option:hover {
+  background: var(--color-second);
+}
 .option {
-  height: 100px;
+  min-height: 100px;
   font-size: 20px;
 }
 </style>
