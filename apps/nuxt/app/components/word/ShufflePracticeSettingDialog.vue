@@ -3,6 +3,14 @@
 import Slider from "~/components/base/Slider.vue";
 import {defineAsyncComponent, watch} from "vue";
 import {useBaseStore} from "~/stores/base.ts";
+import { WordPracticeMode } from "~/types/enum";
+import { WordPracticeModeNameMap } from "~/config/env";
+
+const props = defineProps({
+  wordPracticeMode: Number,
+})
+
+let wordPracticeMode = $computed(() => WordPracticeModeNameMap[props.wordPracticeMode])
 
 const Dialog = defineAsyncComponent(() => import('~/components/dialog/Dialog.vue'))
 
@@ -27,13 +35,13 @@ watch(() => model.value, (n) => {
 </script>
 
 <template>
-  <Dialog v-model="model" title="随机复习设置"
+  <Dialog v-model="model" :title="wordPracticeMode + '设置'"
           :footer="true"
           :padding="true"
           @ok="emit('ok',num)">
     <div class="w-120 color-main">
       <div class="flex gap-4 items-end mb-2">
-        <span>随机复习：<span class="font-bold">{{ store.sdict.name }}</span></span>
+        <span>{{ wordPracticeMode }}：<span class="font-bold">{{ store.sdict.name }}</span></span>
         <span class="target-number">{{ num }}</span>个单词
       </div>
       <div class="flex gap-space">
