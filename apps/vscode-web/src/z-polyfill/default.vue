@@ -19,8 +19,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-primary flex flex-col h-screen anim relative overflow-hidden">
-    <div class="flex justify-between p-4">
+  <div class="bg-primary flex flex-col p-4 box-border h-screen anim relative overflow-hidden">
+    <div class="flex justify-between ">
       <div class="tab bg-black py-1 px-2 rounded-md">Content Security Policy violations</div>
       <div class="flex gap-space">
         <BaseIcon>

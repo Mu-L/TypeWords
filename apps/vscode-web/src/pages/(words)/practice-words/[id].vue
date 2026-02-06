@@ -679,8 +679,49 @@ useEvents([
 <template>
   <PracticeLayout v-loading="loading" panelLeft="var(--word-panel-margin-left)">
     <template v-slot:practice>
-      <div class="practice-word mb-50">
+      <div class="practice-word">
+        <div>
+          存在的问题
+          入口分散，新人难找
+          要理解「ChatService 从哪来」需要串起：App → useFrameworkProvider → initIoc → initServices → configureChatGlobalStateModule。
+          同时 useFrameworkProvider 里又直接写了 GlobalState、CommonDbService 的注册，同一层既有「模块配置」又有「零散服务」，改一个功能时容易不知道到底该改 useFrameworkProvider 还是某个 configureXxxModule。
+          API 不统一
+          有的用 framework.service(ChatService, factory)，有的用 framework.impl(GlobalState, LocalStorageGlobalState) 或 framework.impl(CommonDbService, () => new IndexedDBService(...))。
+          「Service 和 impl 区别是什么、什么时候用哪个」没有一眼能看出的约定，需要翻 infra 文档或源码，对接手的人不友好。
+          初始化与首屏
+        若要做 SSR 或更严格的加载态，这里要再设计（例如同步创建、或明确的 Loading 组件）。
+        依赖数组与单例
+        useEffect(..., []) 依赖为空，但闭包用了 provider。若未来 provider 会变（例如切换环境/后端），当前实现不会重新 init，容易踩坑；若本来就是「全局单例、永不换」则问题不大，但缺少注释说明意图。
+        遗留与细节
+        initIoc.ts 里的 console.log('initServices', initServices) 像是调试遗留，生产代码里不合适。
+        ChatService 一个类 300+ 行，承担了会话、消息、流式、PV、任务步骤等，改其中一块时要在大类里找，可维护性一般。
+
+      </div>
         <TypeWord ref="typingRef" :word="word" @wrong="onTypeWrong" @complete="next" @know="onWordKnow" />
+        <div>
+          用一句话说
+          不反转：你在代码里自己 new ChatService(...)，自己决定“用谁、什么时候创建”。
+          反转后：你只声明“我要一个 ChatService”，由 IoC 容器根据配置去创建并注入给你。
+          也就是说：控制权从“你的代码”反转到“IoC 框架/容器”。
+          在你项目里的对应关系
+          你们项目里的 IoC 就是这套 Framework + Provider：
+          概念	在你项目里
+          容器	Framework（initIoc 里 new Framework()）
+          注册	framework.service(ChatService, factory)、framework.impl(GlobalState, ...) 等，告诉容器“遇到 ChatService 就用这个工厂创建”
+          解析/注入	useService(ChatService) 或 f.get(ChatService)，向容器要实例，容器负责创建（或返回已缓存的）并给你
+          所以：IoC = 把“创建 ChatService / 决定用哪个实现”的控制权，从组件/业务代码里抽走，交给 Framework 这个容器。
+          为什么要用 IoC（两个直接好处）
+          解耦
+          组件只写 useService(ChatService)，不关心 ChatService 依赖谁、怎么 new。依赖关系集中在“注册处”（如 configureChatGlobalStateModule），改实现时不用改所有调用的地方。
+          易测试
+          测试时可以在容器里注册一个假的 ChatService（mock），组件无感知，照样 useService(ChatService)，拿到的是你注入的 mock。
+          和 DI 的关系
+          IoC：强调“控制权反转”这个思想。
+          DI（Dependency Injection，依赖注入）：强调“依赖由外部注入进来”的实现方式。
+          你们项目是 用 DI 这种方式实现了 IoC：通过 useService(...) / f.get(...) 把依赖“注入”进组件或服务，而不是自己在内部 new。所以平时说“项目的 IoC/DI 设计”指的都是这一套。
+        </div>
+        <div class="h-20 w-full">
+        </div>
       </div>
     </template>
     <template v-slot:panel>

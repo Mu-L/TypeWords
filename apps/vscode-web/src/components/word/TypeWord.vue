@@ -8,15 +8,12 @@ import { onMounted, onUnmounted, watch } from 'vue'
 import SentenceHightLightWord from '~/components/word/SentenceHightLightWord.vue'
 import { usePracticeStore } from '~/stores/practice'
 import { getDefaultWord } from '~/types/func'
-import { _nextTick, last } from '~/utils'
 import BaseButton from '~/components/BaseButton.vue'
 import Space from '~/components/article/Space.vue'
 import Toast from '~/components/base/toast/Toast'
 import Tooltip from '~/components/base/Tooltip.vue'
 import { ShortcutKey, WordPracticeStage, WordPracticeType } from '~/types/enum'
-import { useI18n } from 'vue-i18n'
 import HoverReveal from '@/components/word/HoverReveal.vue'
-const { t: $t } = useI18n()
 
 interface IProps {
   word: Word
@@ -430,16 +427,10 @@ useEvents([
       <div class="flex gap-space items-center">
         <Tooltip
           :title="
-          settingStore.dictation ? `可以按快捷键 ${settingStore.shortcutKeyMap[ShortcutKey.ShowWord]} 显示单词` : ''
-        "
+            settingStore.dictation ? `可以按快捷键 ${settingStore.shortcutKeyMap[ShortcutKey.ShowWord]} 显示单词` : ''
+          "
         >
-          <div
-            id="word"
-            class="word"
-            :class="wrong && 'is-wrong'"
-            @mouseenter="showWord"
-            @mouseleave="mouseleave"
-          >
+          <div id="word" class="word" :class="wrong && 'is-wrong'" @mouseenter="showWord" @mouseleave="mouseleave">
             <div v-if="settingStore.wordPracticeType === WordPracticeType.Dictation">
               <div
                 class="letter text-align-center w-full inline-block"
@@ -447,10 +438,7 @@ useEvents([
               >
                 {{ word.word }}
               </div>
-              <div
-                class="mt-2 w-120 dictation"
-                :class="showWordResult ? (right ? 'right' : 'wrong') : ''"
-              >
+              <div class="mt-2 w-120 dictation" :class="showWordResult ? (right ? 'right' : 'wrong') : ''">
                 <template v-for="i in input">
                   <span class="l" v-if="i !== ' '">{{ i }}</span>
                   <Space class="l" v-else :is-wrong="showWordResult ? !right : false" :is-wait="!showWordResult" />
@@ -461,13 +449,13 @@ useEvents([
               <span class="input" v-if="input">{{ input }}</span>
               <span class="wrong" v-if="wrong">{{ wrong }}</span>
               <span class="letter" v-if="settingStore.dictation && !showFullWord">
-              {{
+                {{
                   displayWord
                     .split('')
                     .map(v => (v === ' ' ? '&nbsp;' : '_'))
                     .join('')
                 }}
-            </span>
+              </span>
               <span class="letter" v-else>{{ displayWord }}</span>
             </template>
           </div>
@@ -476,14 +464,14 @@ useEvents([
           <div
             class="phonetic"
             :class="
-            (settingStore.dictation ||
-              [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
-                settingStore.wordPracticeType
-              )) &&
-            !showFullWord &&
-            !showWordResult &&
-            'word-shadow'
-          "
+              (settingStore.dictation ||
+                [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
+                  settingStore.wordPracticeType
+                )) &&
+              !showFullWord &&
+              !showWordResult &&
+              'word-shadow'
+            "
             v-if="settingStore.soundType === 'uk' && word.phonetic0"
           >
             [{{ word.phonetic0 }}]
@@ -491,14 +479,14 @@ useEvents([
           <div
             class="phonetic"
             :class="
-            (settingStore.dictation ||
-              [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
-                settingStore.wordPracticeType
-              )) &&
-            !showFullWord &&
-            !showWordResult &&
-            'word-shadow'
-          "
+              (settingStore.dictation ||
+                [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
+                  settingStore.wordPracticeType
+                )) &&
+              !showFullWord &&
+              !showWordResult &&
+              'word-shadow'
+            "
             v-if="settingStore.soundType === 'us' && word.phonetic1"
           >
             [{{ word.phonetic1 }}]
@@ -522,13 +510,13 @@ useEvents([
           :keyboard="`${$t('shortcut')}(${settingStore.shortcutKeyMap[ShortcutKey.KnowWord]})`"
           size="large"
           @click="know"
-        >{{ $t('i_know') }}
+          >{{ $t('i_know') }}
         </BaseButton>
         <BaseButton
           :keyboard="`${$t('shortcut')}(${settingStore.shortcutKeyMap[ShortcutKey.UnknownWord]})`"
           size="large"
           @click="unknown"
-        >{{ $t('i_dont_know') }}
+          >{{ $t('i_dont_know') }}
         </BaseButton>
       </div>
 
@@ -579,19 +567,16 @@ useEvents([
 
       <template v-if="word?.phrases?.length">
         <div class="line-white my-3"></div>
-        <div class="flex">
-          <div class="shrink-0">{{ $t('phrases') }}</div>
-          <div class="flex flex-wrap">
-            <span class="flex items-center gap-2 mr-2" v-for="item in word.phrases">
-              <SentenceHightLightWord
-                class="en shrink-0"
-                :text="item.c"
-                :word="word.word"
-                :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
-              />
-              <span class="cn anim shrink-0" v-opacity="settingStore.translate || showFullWord || showWordResult">
-                {{ item.cn }} /
-              </span>
+        <div class="flex-wrap">
+          <div class="flex items-center gap-2 mr-2" v-for="item in word.phrases">
+            <SentenceHightLightWord
+              class="en shrink-0"
+              :text="item.c"
+              :word="word.word"
+              :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
+            />
+            <span class="cn anim shrink-0" v-opacity="settingStore.translate || showFullWord || showWordResult">
+              {{ item.cn }}
             </span>
           </div>
         </div>
@@ -640,26 +625,6 @@ useEvents([
     }
   }
 
-  .tabs {
-    @apply: text-lg font-medium;
-    display: flex;
-    gap: 2rem;
-
-    .tab {
-      cursor: pointer;
-
-      &.active {
-        border-bottom: 2px solid var(--color-font-2);
-      }
-    }
-  }
-
-  .label {
-    width: 6rem;
-    padding-top: 0.2rem;
-    flex-shrink: 0;
-  }
-
   .cn {
     @apply text-base;
   }
@@ -674,5 +639,7 @@ useEvents([
   }
 }
 
-
+.line-white {
+  border-bottom: 0.5px solid #676666;
+}
 </style>
