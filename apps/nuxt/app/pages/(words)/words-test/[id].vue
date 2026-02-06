@@ -205,8 +205,15 @@ async function init() {
     return Toast.warning('没有单词可测试！')
   }
   if (runtimeStore.routeData.taskWords) {
-    testWords = runtimeStore.routeData.taskWords.shuffle
-  } else {
+    let currentStudy = runtimeStore.routeData.taskWords
+    if (currentStudy.shuffle.length ) {
+      testWords = runtimeStore.routeData.taskWords.shuffle
+    } else if (currentStudy.review.length || currentStudy.write.length) {
+      testWords = runtimeStore.routeData.taskWords.write
+      testWords.push(...currentStudy.review)
+    }
+  }
+  if (!testWords.length) {
     testWords = shuffle(dict.words)
   }
   allWords = shuffle(dict.words)

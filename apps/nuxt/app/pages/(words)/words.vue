@@ -37,6 +37,7 @@ import {
   Origin,
   TourConfig,
   WordPracticeModeNameMap,
+  WordPracticeModeUrlMap,
 } from '@/config/env.ts'
 import { myDictList } from '@/apis'
 import PracticeWordListDialog from '~/components/word/PracticeWordListDialog.vue'
@@ -53,6 +54,8 @@ const { nav } = useNav()
 const runtimeStore = useRuntimeStore()
 let loading = $ref(true)
 let isSaveData = $ref(false)
+
+const shouldShowDialogPracticeMode = $ref([WordPracticeMode.Shuffle, WordPracticeMode.ShuffleWordsTest])
 
 useHead({
   title: APP_NAME + ' 单词',
@@ -130,15 +133,21 @@ async function init() {
 }
 
 function startPractice(practiceMode: WordPracticeMode, resetCache: boolean = false): void {
+  if (resetCache) {
+     setPracticeWordCache(null)
+  }
+  if (shouldShowDialogPracticeMode.includes(practiceMode)) {
+    editingWordPracticeMode = practiceMode
+    showShufflePracticeSettingDialog = true
+    return
+  }
+  
   if (store.sdict.id) {
     if (!store.sdict.words.length) {
       Toast.warning('没有单词可学习！')
       return
     }
 
-    if (resetCache) {
-      setPracticeWordCache(null)
-    }
     settingStore.wordPracticeMode = practiceMode
 
     window.umami?.track('startStudyWord', {
@@ -151,37 +160,21 @@ function startPractice(practiceMode: WordPracticeMode, resetCache: boolean = fal
     })
     //把是否是第一次设置为false
     settingStore.first = false
-    nav('practice-words/' + store.sdict.id, {}, { taskWords: currentStudy })
+    nav(WordPracticeModeUrlMap[practiceMode]  + '/' +  store.sdict.id, {}, { taskWords: currentStudy })
   } else {
     window.umami?.track('no-dict')
     Toast.warning('请先选择一本词典')
   }
 }
 
-function startWordsTest() {
-  editingWordPracticeMode = WordPracticeMode.WordsTest
-  showShufflePracticeSettingDialog = true
-  navUrl.value = 'words-test/'
-}
-
-function startRandomReview() {
-  editingWordPracticeMode = WordPracticeMode.Shuffle
-  showShufflePracticeSettingDialog = true
-  navUrl.value = 'practice-words/'
-}
-
 function freePractice() {
   startPractice(WordPracticeMode.Free, settingStore.wordPracticeMode !== WordPracticeMode.Free)
 }
 function systemPractice() {
-  if (settingStore.wordPracticeMode === WordPracticeMode.WordsTest) {
-    startWordsTest()
-  } else {
-    startPractice(
-      settingStore.wordPracticeMode === WordPracticeMode.Free ? WordPracticeMode.System : settingStore.wordPracticeMode,
-      settingStore.wordPracticeMode === WordPracticeMode.Free
-    )
-  }
+  startPractice(
+    settingStore.wordPracticeMode === WordPracticeMode.Free ? WordPracticeMode.System : settingStore.wordPracticeMode,
+    settingStore.wordPracticeMode === WordPracticeMode.Free
+  )
 }
 
 let editingWordPracticeMode = $ref(0)
@@ -257,8 +250,6 @@ async function savePracticeSetting() {
   currentStudy = getCurrentStudyWord()
 }
 
-let navUrl = ref('practice-words/')
-
 async function onShufflePracticeSettingOk(total) {
   window.umami?.track('startShuffleStudyWord', {
     name: store.sdict.name,
@@ -276,7 +267,7 @@ async function onShufflePracticeSettingOk(total) {
     store.sdict.words.slice(0, store.sdict.lastLearnIndex).filter(v => !ignoreList.includes(v.word))
   ).slice(0, total)
   nav(
-    navUrl.value + store.sdict.id,
+    WordPracticeModeUrlMap[editingWordPracticeMode] + '/' + store.sdict.id,
     {},
     {
       taskWords: currentStudy,
@@ -467,17 +458,25 @@ const systemPracticeText = $computed(() => {
                 class="w-full"
                 v-if="settingStore.wordPracticeMode !== WordPracticeMode.Shuffle"
                 :disabled="store.sdict.lastLearnIndex < 10 && !store.sdict.complete"
-                @click="startRandomReview()"
+                @click="startPractice(WordPracticeMode.Shuffle, true)"
               >
                 {{ $t('random_review') }}
               </BaseButton>
               <BaseButton
                 class="w-full"
-                v-if="settingStore.wordPracticeMode !== WordPracticeMode.WordsTest"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.ReviewWordsTest"
                 :disabled="store.sdict.lastLearnIndex < 10 && !store.sdict.complete"
-                @click="startWordsTest()"
+                @click="startPractice(WordPracticeMode.ReviewWordsTest, true)"
               >
                 {{ $t('words') }}{{ $t('test') }}
+              </BaseButton>
+              <BaseButton
+                class="w-full"
+                v-if="settingStore.wordPracticeMode !== WordPracticeMode.ShuffleWordsTest"
+                :disabled="store.sdict.lastLearnIndex < 10 && !store.sdict.complete"
+                @click="startPractice(WordPracticeMode.ShuffleWordsTest, true)"
+              >
+                {{ $t('random') }}{{ $t('words') }}{{ $t('test') }}
               </BaseButton>
 
               <!--              <BaseButton-->

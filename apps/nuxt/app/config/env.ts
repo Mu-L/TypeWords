@@ -196,7 +196,19 @@ export const WordPracticeModeNameMap: Record<WordPracticeMode, string> = {
   [WordPracticeMode.ListenOnly]: '听写',
   [WordPracticeMode.Shuffle]: '随机复习',
   [WordPracticeMode.Review]: '复习',
-  [WordPracticeMode.WordsTest]: '单词测试',
+  [WordPracticeMode.ShuffleWordsTest]: '随机单词测试',
+  [WordPracticeMode.ReviewWordsTest]: '单词测试'
+}
+export const WordPracticeModeUrlMap: Record<WordPracticeMode, string> = {
+  [WordPracticeMode.System]: '/practice-words',
+  [WordPracticeMode.Free]: '/practice-words',
+  [WordPracticeMode.IdentifyOnly]: '/practice-words',
+  [WordPracticeMode.DictationOnly]: '/practice-words',
+  [WordPracticeMode.ListenOnly]: '/practice-words',
+  [WordPracticeMode.Shuffle]: '/practice-words',
+  [WordPracticeMode.Review]: '/practice-words',
+  [WordPracticeMode.ShuffleWordsTest]: '/words-test',
+  [WordPracticeMode.ReviewWordsTest]: '/words-test'
 }
 export class DictId {
   static wordCollect = 'wordCollect'

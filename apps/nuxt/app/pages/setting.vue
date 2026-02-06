@@ -478,9 +478,8 @@ function transferOk() {
 
       .tab {
         @apply cursor-pointer flex items-center relative;
-        padding: 0.6rem 0.9rem;
         border-radius: 0.5rem;
-        width: 10rem;
+        @apply w-auto p-1 lg:w-40 lg:p-2;
         gap: 0.6rem;
         transition: all 0.5s;
 
@@ -571,95 +570,4 @@ function transferOk() {
   }
 }
 
-// 移动端适配
-@media (max-width: 768px) {
-  .setting {
-    flex-direction: column;
-
-    .left {
-      width: 100%;
-      border-right: none;
-      border-bottom: 2px solid gainsboro;
-
-      .tabs {
-        flex-direction: row;
-        overflow-x: auto;
-        padding: 0.5rem;
-        gap: 0.3rem;
-
-        .tab {
-          white-space: nowrap;
-          padding: 0.4rem 0.6rem;
-          font-size: 0.9rem;
-
-          span {
-            display: none;
-          }
-        }
-      }
-    }
-
-    .content {
-      padding: 0 1rem;
-
-      .row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-        min-height: auto;
-        padding: 0.5rem 0;
-
-        .wrapper {
-          width: 100%;
-          justify-content: flex-start;
-
-          .set-key {
-            width: 100%;
-
-            input {
-              width: 100%;
-              max-width: 200px;
-            }
-          }
-
-          // 补充：选择器和输入框优化
-          .base-select,
-          .base-input {
-            width: 100% !important;
-            max-width: none;
-          }
-
-          // 单选按钮组优化
-          .radio-group {
-            flex-direction: column;
-            gap: 0.5rem;
-
-            .radio {
-              min-height: 44px;
-              width: 100%;
-            }
-          }
-
-          // 滑块优化
-          .slider {
-            width: 100%;
-          }
-        }
-
-        .main-title {
-          font-size: 1rem;
-        }
-
-        .item-title {
-          font-size: 0.9rem;
-        }
-      }
-
-      .body {
-        height: auto;
-        max-height: 60vh;
-      }
-    }
-  }
-}
 </style>

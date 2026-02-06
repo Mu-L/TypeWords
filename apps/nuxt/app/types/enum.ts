@@ -53,6 +53,7 @@ export enum PracticeArticleWordType {
 //练习模式
 //新增模式，记得测试正常流程
 export enum WordPracticeMode {
+  // practice-words
   System = 0,
   Free = 1,
   IdentifyOnly = 2, // 独立自测模式
@@ -60,7 +61,9 @@ export enum WordPracticeMode {
   ListenOnly = 4, // 独立听写模式
   Shuffle = 5, // 随机复习模式
   Review = 6, // 复习模式
-  WordsTest = 7, // 单词测试模式
+  // words-test
+  ShuffleWordsTest = 7, // 单词测试模式
+  ReviewWordsTest = 8, // 单词测试模式
 }
 
 //练习类型
