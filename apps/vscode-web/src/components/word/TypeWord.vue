@@ -474,7 +474,7 @@ useEvents([
             "
             v-if="settingStore.soundType === 'uk' && word.phonetic0"
           >
-            / {{ word.phonetic0 }}
+            | {{ word.phonetic0 }}
           </div>
           <div
             class="phonetic"
@@ -489,7 +489,7 @@ useEvents([
             "
             v-if="settingStore.soundType === 'us' && word.phonetic1"
           >
-            / {{ word.phonetic1 }}
+            | {{ word.phonetic1 }}
           </div>
           <template v-slot:hover>
             <VolumeIcon
@@ -520,7 +520,7 @@ useEvents([
         </BaseButton>
       </div>
 
-      <div class="translate text-sm flex flex-col gap-2" v-opacity="settingStore.translate || showWordResult || showFullWord">
+      <div class="translate text-sm" v-opacity="settingStore.translate || showWordResult || showFullWord">
         <div class="flex" v-for="v in word.trans">
           <span class="shrink-0 mr-1" :class="v.pos ? 'en-article-family' : ''">
             {{ v.pos }}
@@ -541,6 +541,8 @@ useEvents([
       "
     >
       <template v-if="word?.sentences?.length">
+        <div class="line-white my-1"></div>
+
         <div class="flex flex-col gap-">
           <div class="sentence" v-for="item in word.sentences">
             <HoverReveal class="flex gap-1">
@@ -564,7 +566,7 @@ useEvents([
       </template>
 
       <template v-if="word?.phrases?.length">
-        <div class="line-white my-3"></div>
+        <div class="line-white my-1"></div>
         <div class="flex-wrap">
           <div class="flex items-center gap-2 mr-2" v-for="item in word.phrases">
             <SentenceHightLightWord
@@ -634,6 +636,6 @@ useEvents([
 }
 
 .line-white {
-  border-bottom: 0.5px solid #676666;
+  border-bottom: 0.5px solid #433f3f;
 }
 </style>
