@@ -474,7 +474,7 @@ useEvents([
             "
             v-if="settingStore.soundType === 'uk' && word.phonetic0"
           >
-            [{{ word.phonetic0 }}]
+            / {{ word.phonetic0 }}
           </div>
           <div
             class="phonetic"
@@ -489,7 +489,7 @@ useEvents([
             "
             v-if="settingStore.soundType === 'us' && word.phonetic1"
           >
-            [{{ word.phonetic1 }}]
+            / {{ word.phonetic1 }}
           </div>
           <template v-slot:hover>
             <VolumeIcon
@@ -520,10 +520,7 @@ useEvents([
         </BaseButton>
       </div>
 
-      <div
-        class="translate flex flex-col gap-2 my-3"
-        v-opacity="settingStore.translate || showWordResult || showFullWord"
-      >
+      <div class="translate text-sm flex flex-col gap-2" v-opacity="settingStore.translate || showWordResult || showFullWord">
         <div class="flex" v-for="v in word.trans">
           <span class="shrink-0 mr-1" :class="v.pos ? 'en-article-family' : ''">
             {{ v.pos }}
@@ -543,22 +540,23 @@ useEvents([
         showWordResult
       "
     >
-      <div class="line-white my-3"></div>
       <template v-if="word?.sentences?.length">
         <div class="flex flex-col gap-">
           <div class="sentence" v-for="item in word.sentences">
             <HoverReveal class="flex gap-1">
-              <span>Read</span>
-              <SentenceHightLightWord
-                :text="item.c"
-                :word="word.word"
-                :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
-              />
+              <span class="text-sm">
+                <span class="shrink-0">Read </span>
+                <SentenceHightLightWord
+                  :text="item.c"
+                  :word="word.word"
+                  :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
+                />
+              </span>
               <template v-slot:hover>
                 <VolumeIcon :title="`发音`" :simple="false" @click="ttsPlayAudio(item.c)" />
               </template>
             </HoverReveal>
-            <div class="anim" v-opacity="settingStore.translate || showFullWord || showWordResult">
+            <div class="anim text-sm" v-opacity="settingStore.translate || showFullWord || showWordResult">
               {{ item.cn }}
             </div>
           </div>
@@ -570,12 +568,12 @@ useEvents([
         <div class="flex-wrap">
           <div class="flex items-center gap-2 mr-2" v-for="item in word.phrases">
             <SentenceHightLightWord
-              class="en shrink-0"
+              class="shrink-0"
               :text="item.c"
               :word="word.word"
               :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
             />
-            <span class="cn anim shrink-0" v-opacity="settingStore.translate || showFullWord || showWordResult">
+            <span class="anim shrink-0" v-opacity="settingStore.translate || showFullWord || showWordResult">
               {{ item.cn }}
             </span>
           </div>
@@ -596,7 +594,8 @@ useEvents([
   word-break: break-word;
   position: relative;
 
-  .phonetic, .translate {
+  .phonetic,
+  .translate {
     //font-size: 1.2rem;
   }
 

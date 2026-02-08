@@ -16,6 +16,7 @@ defineOptions({ name: 'HoverReveal' })
   &__content {
     opacity: 0;
     transition: opacity 0.2s ease;
+    display: flex;
   }
 
   &:hover &__content {
