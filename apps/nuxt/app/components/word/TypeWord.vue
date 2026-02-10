@@ -46,6 +46,7 @@ let cursor = $ref({
 })
 const settingStore = useSettingStore()
 const statStore = usePracticeStore()
+const store = useBaseStore()
 
 const playBeep = usePlayBeep()
 const playCorrect = usePlayCorrect()
@@ -585,8 +586,15 @@ const notice = $computed(() => {
         </BaseButton>
       </div>
 
-      <div class="center my-5" v-if="notice.show">
-        <ToastComponent :duration="0" confirm :shadow="false" :showClose="true" :message="notice.text" />
+      <div class="center my-5" v-if="notice.show && settingStore.showUsageTips">
+        <ToastComponent
+          :duration="0"
+          confirm
+          :shadow="false"
+          :showClose="store.sdict.statistics.length > 2"
+          :message="notice.text"
+          @close="settingStore.showUsageTips = false"
+        />
       </div>
 
       <div
@@ -616,8 +624,8 @@ const notice = $computed(() => {
         showWordResult
       "
     >
-      <div class="line-white my-3"></div>
       <template v-if="word?.sentences?.length">
+        <div class="line-white my-3"></div>
         <div class="flex flex-col gap-3">
           <div class="sentence" v-for="item in word.sentences">
             <div class="flex gap-space">
@@ -686,7 +694,6 @@ const notice = $computed(() => {
       >
         <template v-if="word?.etymology?.length">
           <div class="line-white my-3"></div>
-
           <div class="flex">
             <div class="label">{{ $t('etymology') }}</div>
             <div class="text-base">

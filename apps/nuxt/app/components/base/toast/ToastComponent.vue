@@ -4,7 +4,6 @@
       v-if="visible"
       class="message"
       :class="{ [type]: true, shadow }"
-      :style="style"
       @mouseenter="handleMouseEnter"
       @mouseleave="handleMouseLeave"
     >
@@ -15,25 +14,14 @@
         <IconFluentDismissCircle20Filled v-if="props.type === 'error'" class="message-icon" />
         <span class="message-text">{{ message }}</span>
 
-        <div class="relative group">
-          <div class="transition-all duration-300">
-            <Close v-if="showClose" class="message-close" @click="close" />
-          </div>
-          <div
-            v-if="confirm"
-            class="flex gap-2 pt-3 absolute z-2 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
-          >
-            <div class="whitespace-nowrap">不再显示</div>
-            <Checkbox/>
-          </div>
-        </div>
+        <Close v-if="showClose" class="message-close" @click="close" />
       </div>
     </div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 interface Props {
   message: string
@@ -55,10 +43,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['close'])
 const visible = ref(false)
 let timer = null
-
-const style = computed(() => ({
-  // 移除offset，现在由容器管理位置
-}))
 
 const startTimer = () => {
   if (props.duration > 0) {
@@ -113,9 +97,9 @@ defineExpose({
   border: 1px solid #ebeef5;
   transition: all 0.3s ease;
   pointer-events: auto;
-  @apply rounded-md py-3 px-5 relative min-w-50 ;
+  @apply rounded-md py-3 px-5 relative min-w-50;
 
-  &.shadow{
+  &.shadow {
     @apply shadow-xl;
   }
 
@@ -186,7 +170,7 @@ html.dark {
 }
 
 .message-close {
-  @apply ml-10 cp opacity-70 hover:opacity-100;
+  @apply w-10 flex justify-end cp opacity-70 hover:opacity-100;
 }
 
 .message-fade-enter-active,
